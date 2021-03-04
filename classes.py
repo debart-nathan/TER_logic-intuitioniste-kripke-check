@@ -1,12 +1,14 @@
 class Node(object):
 	"""docstring for Node"""
-	def __init__(self, suc1, suc2=None):
-		if suc2 != None:
-			self.succ = (suc1,suc2)
-			self.ar = 2
+	
+
+	def __init__(self, ar, succtup):
+		if ar != 0:
+			self.succ = succtup
+			self.ar = ar
 		else :
-			self.succ = suc1
-			self.ar = 1
+			self.succ = Node.classVar
+			self.ar = None
 
 	def traitement(self):
 		pass
@@ -18,7 +20,7 @@ class Node(object):
 class And(Node):
 
 	def __init__(self, arg, arg2):
-		super(And, self).__init__(arg, arg2)
+		super(And, self).__init__(2,(arg, arg2))
 
 	def __repr__(self):
 		return '('+self.succ[0].__repr__()+" ^ "+self.succ[1].__repr__()+')'
@@ -26,7 +28,7 @@ class And(Node):
 class Or(Node):
 
 	def __init__(self, arg, arg2):
-		super(Or, self).__init__(arg, arg2)
+		super(Or, self).__init__(2,(arg, arg2))
 
 	def __repr__(self):
 		return '('+self.succ[0].__repr__()+" v "+self.succ[1].__repr__()+')'
@@ -34,7 +36,7 @@ class Or(Node):
 class Imp(Node):
 
 	def __init__(self, arg, arg2):
-		super(Imp, self).__init__(arg, arg2)
+		super(Imp, self).__init__(2,(arg, arg2))
 		
 	def __repr__(self):
 		return '('+self.succ[0].__repr__()+" => "+self.succ[1].__repr__()+')'
@@ -42,7 +44,7 @@ class Imp(Node):
 class Not(Node):
 
 	def __init__(self, arg):
-		super(Not, self).__init__(arg)
+		super(Not, self).__init__(1,(arg))
 
 	def __repr__(self):
 		return '!('+self.succ.__repr__()+')'
@@ -56,7 +58,7 @@ class Variable(Node):
 		return self.name.upper()
 		
 
-
+Node.classVar = Variable("undefined")
 
 
 #formumle = X => ( Y v X )
