@@ -78,6 +78,9 @@ class Variable(Atom):
 	def value(self):
 		self._value = False
 
+	def traitement(self, world):
+		return self in world.vars
+
 	def __repr__(self): 
 		return self.name.upper()
 
