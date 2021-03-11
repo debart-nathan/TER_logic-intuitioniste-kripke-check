@@ -50,6 +50,15 @@ class Imp(Node):
 		
 	def __repr__(self):
 		return '('+self.succ[0].__repr__()+" => "+self.succ[1].__repr__()+')'
+	
+	def traitement(self,world):
+
+		if self.succ[0].traitement(world) and not self.succ[1].traitement(world) :
+			return False
+		for son in world.sons():
+			if not self.traitement(son) :
+				return False
+		return True
 		
 class Not(Node):
 
