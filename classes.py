@@ -22,6 +22,9 @@ class Atom(Node):
 	def __init__(self):
 		super(Atom, self).__init__(0)
 
+	def traitement(self, world):
+		return self.value
+
 
 ### représentation des formules
 class And(Node):
@@ -68,9 +71,9 @@ class Not(Node):
 
 class Variable(Atom):
 	"""docstring for Variable"""
-	def __init__(self, name):
+	def __init__(self, name, value = False):
 		self.name = name
-		self._value = False
+		self._value = value
 
 	@property
 	def value(self):
