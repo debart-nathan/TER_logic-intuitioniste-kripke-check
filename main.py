@@ -8,8 +8,18 @@ window = kernelPygame.Graphics(resRatio=4/3)
 screen_ratio = window.screen_l/1200
 
 exit = False
+formulaMode = True
+modelMode = False
+
+
+
 while not(exit):
 	window.displayBackgroundUpdate()
 
+	if formulaMode :
+		#GUI pour la formule
+
+	if modelMode :
+		#GUI pour le modèle
 	
 	exit = window()
