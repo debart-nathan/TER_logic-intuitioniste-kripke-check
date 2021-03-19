@@ -2,20 +2,22 @@ class Node(object):
 	"""docstring for Node"""
 	
 
-	def __init__(self, ar, succtup = ()):
+	def __init__(self, ar, succtup = None):
 		if ar != 0:
 			self.succ = succtup
 			self.ar = ar
 		else :
 			self.succ = Node.classVar
 			self.ar = None
+		self.name = self.__class__.__name__
 
 	def treatment(self):
 		pass
 
+	"""
 	def __repr__(self):
 		if self.ar == 1 :
-			return self.succ.__repr__()
+			return self.succ.__repr__()"""
 
 class Atom(Node):
 	"""docstring for Atom"""
@@ -30,7 +32,7 @@ class Atom(Node):
 class And(Node):
 
 	def __init__(self, arg, arg2):
-		super(And, self).__init__(2,(arg, arg2))
+		super(And, self).__init__(2,[arg, arg2])
 
 	def treatment(self, world):
 		return self.succ[0].treatment(world) and self.succ[1].treatment(world)
@@ -42,7 +44,7 @@ class And(Node):
 class Or(Node):
 
 	def __init__(self, arg, arg2):
-		super(Or, self).__init__(2,(arg, arg2))
+		super(Or, self).__init__(2,[arg, arg2])
 
 	def treatment(self, world):
 		return self.succ[0].treatment(world) or self.succ[1].treatment(world)
@@ -55,7 +57,7 @@ class Or(Node):
 class Imp(Node):
 
 	def __init__(self, arg, arg2):
-		super(Imp, self).__init__(2,(arg, arg2))
+		super(Imp, self).__init__(2,[arg, arg2])
 		
 	def treatment(self,world):
 
@@ -71,20 +73,17 @@ class Imp(Node):
 class Not(Node):
 
 	def __init__(self, arg):
-		super(Not, self).__init__(1,(arg))
+		super(Not, self).__init__(1,[arg])
 
 	def treatment(self, world):
 
 		for wrld in [world]+world.sons:
-			if self.succ.treatment(wrld) :
+			if self.succ[0].treatment(wrld) :
 				return False
-
 		return True
 
 	def __repr__(self):
-		return '!('+self.succ.__repr__()+')'
-
-
+		return '!('+self.succ[0].__repr__()+')'
 
 class Variable(Atom):
 	"""docstring for Variable"""
@@ -164,10 +163,10 @@ class World(Node):
 	def vars(self, var):
 		try:
 			for x in var :
-				if not (x in self.vars) :
+				if not ((x in self.vars) or (x.name in [n.name for n in self.vars])) :
 					self._vars.append(x)
 		except TypeError:
-			if not (var in self.vars) :
+			if not ((var in self.vars) or (var.name in [n.name for n in self.vars])) :
 				self._vars.append(var)
 		finally :
 			for son in self._sons:
@@ -189,44 +188,3 @@ def valids(formula, rootWorld):
 	return formula.treatment(rootWorld)
 
 Node.classVar = Variable("undefined")
-
-
-
-### TESTZONE
-
-#variables
-X,Y,A,B,C = Variable('x'),Variable('y'),Variable('a'),Variable('b'),Variable('c')
-
-#modèles
-M0,M1,M2 = World("M0",C),World("M1",[A,X]),World("M2",B)
-M0.sons = M1; M0.sons = M2; M1.sons = "M3"
-M1.vars = X; M2.vars = [A,Y]
-
-W0 = World("test TRUE",A)
-W0.sons = "W1";W0.sons = "W2"
-
-W00 = World("test False")
-W00.sons = World("W01",A); W00.sons = "W02"
-
-#formules
-form1 = Imp(X,And(Y,X)) #X => ( Y v X )
-
-form2 = Imp(Or(And(A,B),Not(A)),And(Imp(C,A),Not(C)))
-
-form3 = Or(A,Not(A))
-
-
-#evaluations
-print(form1,"\n")
-print(M0)
-print(valids(form1,M0))
-
-""" 
-A ou non A
-
-print("\n\n",form3)
-print(W0)
-print(valids(form3,W0))
-print(W00)
-print(valids(form3,W00))
-"""
