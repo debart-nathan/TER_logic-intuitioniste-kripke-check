@@ -20,11 +20,12 @@ modelMode = False
 
 #preload d'un modèle et d'une formule
 unpacking = Userdata()
-unpacking.load(fileset="0",defaultDataFolder = True)
+unpacking.load(fileset="1",defaultDataFolder = True)
 preLoadedModel = unpacking.model
 preLoadedFormula = unpacking.formula
 del unpacking
 
+print(preLoadedFormula,'\n',preLoadedModel,valids(preLoadedFormula,preLoadedModel))
 
 while not(exit):
 	window.displayBackgroundUpdate()

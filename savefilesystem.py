@@ -56,8 +56,10 @@ class Userdata(object):
 			with open("./assets/userdata/"+fileset+".formula","wb") as file:
 				pickle.dump(self.formula,file)
 
-	def load(self, fileset, defaultDataFolder = False):
-		with open("./assets/"+("data" if defaultDataFolder else "userdata")+"/"+fileset+".formula","rb") as file:
-			self.formula = pickle.load(file)
-		with open("./assets/"+("data" if defaultDataFolder else "userdata")+"/"+fileset+".model","rb") as file:
-			self.model = pickle.load(file)
+	def load(self, fileset, defaultDataFolder = False, formula = True, model = True):
+		if formula :
+			with open("./assets/"+("data" if defaultDataFolder else "userdata")+"/"+fileset+".formula","rb") as file:
+				self.formula = pickle.load(file)
+		if model :
+			with open("./assets/"+("data" if defaultDataFolder else "userdata")+"/"+fileset+".model","rb") as file:
+				self.model = pickle.load(file)

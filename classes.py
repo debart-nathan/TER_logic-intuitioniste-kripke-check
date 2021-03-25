@@ -104,7 +104,7 @@ class Variable(Atom):
 		self._value = False
 
 	def treatment(self, world):
-		return self in world.vars
+		return self in world.vars or self.name.lower() in [x.name.lower() for x in world.vars]
 
 	def __repr__(self): 
 		return self.name.upper()

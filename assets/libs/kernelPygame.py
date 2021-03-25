@@ -45,8 +45,10 @@ class Graphics(Resolutions):
 	clock = pygame.time.Clock()
 
 	def __init__(self,size=(None,None),resRatio=16/9):
-
-		#print(sys.argv)
+		"""
+		Pygame video startup w/ 
+		
+		"""
 
 		if size!=(None,None):
 			Graphics.screen_l,Graphics.screen_h = size[0],size[1]
@@ -59,10 +61,6 @@ class Graphics(Resolutions):
 			options["resolution"] = Graphics.screen_l,Graphics.screen_h
 
 		Graphics.screen = pygame.display.set_mode(options["resolution"])
-
-		if [Graphics.screen_l,Graphics.screen_h] != options["resolution"] :
-			Graphics.screen_l = options["resolution"][0]
-			Graphics.screen_h = options["resolution"][1]
 		
 		self._bckg = None
 		self.caption = options["caption"]
@@ -127,7 +125,8 @@ class Graphics(Resolutions):
 	def displaySquare(self,coordinates):
 		self.screen.blit(self.square, [ int(x*[self.screen_l,self.screen_h][coordinates.index(x)]) for x in coordinates])
 
-	def displayActivatable(self,element,displaySet=True):
+	def displayImgElement(self,element,displaySet=True):
+		#element : {"image": Pygame.Surface, "imageAdress": String, "size": [int, int], "position" :[int,int]}
 		if element["image"] == None:
 			img = pygame.image.load(element["imageAdress"]).convert()
 			img = pygame.transform.scale(img, element["size"] )
@@ -139,7 +138,7 @@ class Graphics(Resolutions):
 		return element
 
 	def load_image(self,Adr,size):
-		return self.displayActivatable({"image":None,"imageAdress":Adr,"size":size},False)["image"]
+		return self.displayImgElement({"image":None,"imageAdress":Adr,"size":size},False)["image"]
 
 	
 	#background handler
@@ -200,10 +199,10 @@ class Graphics(Resolutions):
 	def mainloop(self):
 		all_keys = pygame.key.get_pressed()
 		if all_keys[pygame.K_F4] and (all_keys[pygame.K_LALT] or all_keys[pygame.K_RALT]):
-			return(True)
+			return True
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT :
-				return(True)
+				return True
 
 		return False
 
@@ -227,15 +226,6 @@ class Graphics(Resolutions):
 		self.leftClick = pygame.mouse.get_pressed()[0]
 		self.rightClick = pygame.mouse.get_pressed()[2]
 		return pygame.mouse.get_pos()
-
-	##### obsolete
-
-	"""
-	def drawGrid(self):  #for level_editor.py
-		for x in range(1,61):
-			pygame.draw.line(self.screen,[125,125,125],(x*self.screen_l/60,0),(x*self.screen_l/60,self.screen_h))
-		for y in range(1,61):
-			pygame.draw.line(self.screen,[125,125,125],(0,y*self.screen_h/60),(self.screen_l,y*self.screen_h/60))"""
 
 class Button(Graphics):
 	"""UI clickable elements """
@@ -303,11 +293,11 @@ class Button(Graphics):
 
 	def graphicUpdate(self):
 		if self.clicked:
-			self.displayActivatable({"image":self.imgdata["onclick"],"position":self.zone[0]})
+			self.displayImgElement({"image":self.imgdata["onclick"],"position":self.zone[0]})
 		elif self.hover:
-			self.displayActivatable({"image":self.imgdata["hov"],"position":self.zone[0]})
+			self.displayImgElement({"image":self.imgdata["hov"],"position":self.zone[0]})
 		else :
-			self.displayActivatable({"image":self.imgdata["base"],"position":self.zone[0]})
+			self.displayImgElement({"image":self.imgdata["base"],"position":self.zone[0]})
 
 	def __call__(self):
 		self.graphicUpdate()
@@ -342,7 +332,6 @@ class Textzone(Graphics):
 		self.rendered = False
 
 		self.selected = ""
-		#self.
 		self.negative = (75,75,75,25)
 
 	@property
