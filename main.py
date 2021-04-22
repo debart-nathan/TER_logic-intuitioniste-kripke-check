@@ -127,9 +127,10 @@ def createVar():
 		name=var.name
 		if replace(select,var):
 			viewer.drawTree(formula)
+			selectvar.delete(0,tk.END)
 			listvar2= getlistvar()
-				for var in listvar2:
-					selectvar.insert(tk.END,var.lower())
+			for var in listvar2:
+				selectvar.insert(tk.END,var.lower())
 			return messagebox.showinfo('message',f'Var {name} assigned.')
 		else:
 			return messagebox.showinfo('ERROR:',f'Could not find selected node in formula.')
