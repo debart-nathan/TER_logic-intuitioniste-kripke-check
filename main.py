@@ -5,58 +5,41 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 
-formula=cl.Imp(cl.Not(cl.Variable("a")), cl.Or(cl.Variable("undefined"), cl.Variable("b")))
-select=formula
+# formula=cl.Imp(cl.Not(cl.Variable("a")), cl.Or(cl.Variable("undefined"), cl.Variable("b")))
+
+
+formula = cl.Variable('undefined')
+select = formula
 
 
 
-
-	
-		
-
-
-
-def replacerec(father,selected,elem):
-	if not type(father) in [cl.Variable, cl.Top, cl.Bot] :
+def replaceablerec(father,selected,elem):
+	if not isinstance(father, [cl.Variable, cl.Top, cl.Bot]) :
 		if selected in father.succ:
 			father.succ=[elem if x==selected else x for x in father.succ]
 			return True
 		else:
 			for succ in father.succ:
-				if replacerec(succ,selected,elem):
+				if replaceablerec(succ,selected,elem):
 					return True
 			return False
 
 	return False
-				
-				
 
-def replace(selected,elem):
-	global select#temporary
-	global formula#temporary
-	if formula==selected:
-		formula=elem#temporary
-		select=elem#temorary
-		print(formula)
-		return True
-	else:
-		if replacerec(formula,selected,elem):
-			select=elem#temporary
-			print(formula)
-			return True
-		else:
-			return False
+
+
+
 
 
 
 def getlistvarrec(current):
 	listvar=[]
 	
-	if type(current) == cl.Variable:
+	if isinstance(current, cl.Variable):
 		if current.name!='undefined':
 			listvar.append(current.name)
 	
-	elif type(current) != cl.Top and type(current) !=cl.Bot :
+	elif not isinstance(current, cl.Top) and not isinstance(current, cl.Bot) :
 		for succ in current.succ:
 			varsuc=getlistvarrec(succ)
 			for var in varsuc:
@@ -64,13 +47,14 @@ def getlistvarrec(current):
 					listvar.append(var)
 	return listvar
 
-def getlistvar():
+
+def getListVarForm():
 	listvar=[]
 	
-	if type(formula)== cl.Variable:
+	if isinstance(formula, cl.Variable):
 		if formula.name!='undefined':
 			listvar.append(formula.name)
-	elif type(formula) != cl.Top and type(formula) != cl.Bot:
+	elif not isinstance(formula, cl.Top) and not isinstance(formula, cl.Bot):
 		for succ in formula.succ:
 			varsuc=getlistvarrec(succ)
 			for var in varsuc:
@@ -117,7 +101,6 @@ def createMainFrame() :
 	mainFrame.rowconfigure(0, weight = 1)
 
 
-
 def createToolbar() :
 	  
   # BARRE DE MENU
@@ -128,7 +111,7 @@ def createToolbar() :
   # MENU FICHIER DE LA BARRE DE MENU
 
   fichierMenu = Menu(barreMenu, tearoff = 0)
-  fichierMenu.add_command(label = 'Créer un nouveau modèle', command = createFormulaFrame)
+  fichierMenu.add_command(label = 'Créer une nouvelle formule', command = createFormulaFrame)
   fichierMenu.add_command(label = 'Ouvrir un modèle existant', command = None)
   fichierMenu.add_command(label = 'Enregistrer le modèle', command = None) 
   fichierMenu.add_command(label = 'Enregistrer le modèle sous...', command = None) 
@@ -139,9 +122,6 @@ def createToolbar() :
 
 
 def createFormulaFrame() :
-
-	global formula
-	global select
 
 
 	class FormuleWrapper(TreeWrapper):
@@ -169,51 +149,82 @@ def createFormulaFrame() :
 				return 'yellow2'
 			return 'gray77'
 
+	def replace(elem):
+		global select
 
-	def createVar():
+		if isinstance(elem, cl.Variable):
+			select.name = elem.name
+
+	def replaceable(elem):
+		global select
+
+		if isinstance(elem, cl.Variable) :
+
+			if isinstance(select, cl.Variable):
+				return True
+
+			else:
+				return False
+
+	def changeEntryTextFromListbox(*args):
+		if len(variableListbox.curselection()) > 0 :
+			entryText = listVar[int(variableListbox.curselection()[0])]
+			entryTextVar.set(entryText)
+
+
+	def createVar(*args):
 		if varnameEntry.get()!='':
 			if varnameEntry.get()!= 'undefined':
-				name = varnameEntry.get().lower()
 				#select=getSelect()
-				var = cl.Variable(name)
-				if replace(select,var):
+				var = cl.Variable(varnameEntry.get().lower())
+				if replaceable(var):
+					replace(var)
+
 					viewer.drawTree(formula)
-					variableListbox.delete(0, 'end')
-					listvar2= getlistvar()
-					for var in listvar2:
-						variableListbox.insert('end', var.lower())
 
-					return messagebox.showinfo('message',f'Var {name} created.')
+					if var.name not in listVar:
+						listVar.append(var.name)
+						listVarVar.set(listVar)
+
+
+					varnameEntry.delete(0, len(varnameEntry.get()))
+
+					return messagebox.showinfo('message',f'Variable {var.name} crée')
 				else:
-					return messagebox.showinfo('ERROR:',f'Could not find selected node in formula.')
+					return messagebox.showinfo('ERROR:',f"Le nœud n'est pas vide ou une variable")
 			else:
-				return messagebox.showinfo('message',f'undefined is not a valid variable name')
+				return messagebox.showinfo('message',f"undefined n'est pas un nom de variable valide")
 		elif  len(variableListbox.curselection())==1:
-			#select=getSelect()
-			var=cl.Variable(listvar[variableListbox.curselection()[0]])
-			name=var.name
-			if replace(select,var):
+
+			var=cl.Variable(listVar[variableListbox.curselection()[0]])
+			if replaceable(var):
+				replace(var)
 				viewer.drawTree(formula)
-				variableListbox.delete(0, 'end')
-				listvar2= getlistvar()
-				for var in listvar2:
-					variableListbox.insert('end', var.lower())
-				return messagebox.showinfo('message',f'Var {name} assigned.')
+
+				return messagebox.showinfo('message',f'Variable {var.name} assignée.')
+
 			else:
-				return messagebox.showinfo('ERROR:',f'Could not find selected node in formula.')
-		elif len(variableListbox.curselection()) != 0:
-			return messagebox.showinfo('message',f'please select only one var')
+				return messagebox.showinfo('ERROR:',f'Nœud introuvable dans la formule')
 		else:
-			return messagebox.showinfo('message',f'please select item or enter value')
+			return messagebox.showinfo('message',f'Sélectionnez une variable ou entrez en une nouvelle')
 
 
-
-	window.title("TER 2020-2021 - Création d'un modèle")
+	window.title("TER 2020-2021 - Logique Intuitionniste - Éditeur de formule")
 
 
 	# DESTRUCTION DE l'ANCIENNE FENETRE
 
 	destroyMainWindowSons()
+
+
+	# VARIABLES DE CONTROLE
+
+	listVar = []
+	listVarVar = StringVar(value = listVar)
+
+	entryText = ""
+	entryTextVar = StringVar(value = entryText)
+
 
 
 	# CREATION DU CADRE DE LA PAGE CREER FORMULE
@@ -223,17 +234,17 @@ def createFormulaFrame() :
 
 	# CREATION DES ELEMENTS DU CADRE FORMULE
 
-	formulaTitleFrame = ttk.Label(formulaMainFrame, text='Editeur De Formule', style='Titre.TLabel')
+	formulaTitleFrame = ttk.Label(formulaMainFrame, text='Editeur de formule', style='Titre.TLabel')
 	graphFrame = ttk.Frame(formulaMainFrame)
 	toolBox = ttk.Notebook(formulaMainFrame)
 	toolsFrame = ttk.Frame(toolBox)
 	variableFrame = ttk.Frame(toolBox)
-	varnameEntry = ttk.Entry(variableFrame)
-	createVarButton = ttk.Button(variableFrame, text='Créer', command = createVar)
-	variableListbox = Listbox(variableFrame, selectmode = 'single', yscrollcommand = True)
+	varnameEntry = ttk.Entry(variableFrame, textvariable = entryTextVar)
+	createVarButton = ttk.Button(variableFrame, text='Ajouter', command = createVar)
+	variableListbox = Listbox(variableFrame, selectmode = 'browse', yscrollcommand = True, listvariable = listVarVar)
 
 
-	# CREATION DES FRAMES DE REMPLISSAGE DES VIDES
+	# CREATION DES FRAMES DE REMPLISSAGE DES VIDES (si nécessaire)
 
 
 
@@ -264,16 +275,26 @@ def createFormulaFrame() :
 	formulaMainFrame.columnconfigure(0, weight = 1)
 	formulaMainFrame.rowconfigure(1, weight = 1)
 
+	variableFrame.columnconfigure(0, weight = 1)
+	variableFrame.rowconfigure(1, weight = 1)
 
 
 	# PARTIE FONCTIONNELLE
 
-	listvar = getlistvar()
+
+	
+
+	variableListbox.bind("<<ListboxSelect>>", changeEntryTextFromListbox)
+	variableListbox.bind("<Double-1>", createVar)
+	window.bind("<Return>", createVar)
+
+
+	listvar = getListVarForm()
 
 	for var in listvar:
 		variableListbox.insert('end', var.lower())
 
-	fwrap=FormuleWrapper()	
+	fwrap = FormuleWrapper()	
 	viewer = TreeViewer(fwrap, graphFrame, formula)
 
 
@@ -282,9 +303,11 @@ def createFormulaFrame() :
 ###############################################
 		 # INITIALISATION FENÊTRE #	
 ###############################################
+
 window = Tk()
 
 window.minsize(720, 360)
+
 
 
 createToolbar()
