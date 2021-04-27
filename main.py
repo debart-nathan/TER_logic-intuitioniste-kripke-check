@@ -5,10 +5,10 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 
-# formula=cl.Imp(cl.Not(cl.Variable("a")), cl.Or(cl.Variable("undefined"), cl.Variable("b")))
+formula=cl.Imp(cl.Not(cl.Variable("a")), cl.Or(cl.Variable("undefined"), cl.Variable("b")))
 
-
-formula = cl.Variable('undefined')
+worlds= cl.World("M:0,0")
+#formula = cl.Variable('undefined')
 select = formula
 
 
@@ -175,7 +175,6 @@ def createFormulaFrame() :
 	def createVar(*args):
 		if varnameEntry.get()!='':
 			if varnameEntry.get()!= 'undefined':
-				#select=getSelect()
 				var = cl.Variable(varnameEntry.get().lower())
 				if replaceable(var):
 					replace(var)
