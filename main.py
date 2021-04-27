@@ -10,7 +10,7 @@ select=formula
 worlds=cl.World("M:0,0")
 
 
-
+sdfqsdf
 	
 		
 
@@ -28,7 +28,7 @@ def replacerec(father,selected,elem):
 			return False
 
 	return False							
-
+qssdq
 def replace(selected,elem):
 	global select#temporary
 	global formula#temporary
