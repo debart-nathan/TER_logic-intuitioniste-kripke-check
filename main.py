@@ -13,19 +13,6 @@ select = formula
 
 
 
-def replaceablerec(father,selected,elem):
-	if not isinstance(father, [cl.Variable, cl.Top, cl.Bot]) :
-		if selected in father.succ:
-			father.succ=[elem if x==selected else x for x in father.succ]
-			return True
-		else:
-			for succ in father.succ:
-				if replaceablerec(succ,selected,elem):
-					return True
-			return False
-
-	return False
-
 
 
 
@@ -148,21 +135,34 @@ def createFormulaFrame() :
 			if node==select:
 				return 'yellow2'
 			return 'gray77'
+			
 
-	def replace(elem):
-		global select
-
-		if isinstance(elem, cl.Variable):
-			select.name = elem.name
-
-	def replaceable(elem):
-		global select
-
-		if isinstance(elem, cl.Variable) :
-
-			if isinstance(select, cl.Variable):
+	def replacerec(father,selected,elem):
+		if not type(father) in [cl.Variable, cl.Top, cl.Bot] :
+			if selected in father.succ:
+				father.succ=[elem if x==selected else x for x in father.succ]
 				return True
+			else:
+				for succ in father.succ:
+					if replacerec(succ,selected,elem):
+						return True
+				return False
 
+		return False
+
+
+	def replace(selected,elem):
+		global select#temporary
+		global formula#temporary
+		if formula==selected:
+			formula=elem#temporary
+			select=elem#temorary
+			return True
+		else:
+			if replacerec(formula,selected,elem):
+				select=elem#temporary
+				print(formula)
+				return True
 			else:
 				return False
 
@@ -176,8 +176,7 @@ def createFormulaFrame() :
 		if varnameEntry.get()!='':
 			if varnameEntry.get()!= 'undefined':
 				var = cl.Variable(varnameEntry.get().lower())
-				if replaceable(var):
-					replace(var)
+				if replace(select,var):
 
 					viewer.drawTree(formula)
 
@@ -190,7 +189,7 @@ def createFormulaFrame() :
 
 					return messagebox.showinfo('message',f'Variable {var.name} crée')
 				else:
-					return messagebox.showinfo('ERROR:',f"Le nœud n'est pas vide ou une variable")
+					return messagebox.showinfo('ERROR:',f"La node selectionner n'a pas pue être trouvé")
 			else:
 				return messagebox.showinfo('message',f"undefined n'est pas un nom de variable valide")
 		elif  len(variableListbox.curselection())==1:
@@ -218,7 +217,8 @@ def createFormulaFrame() :
 
 	# VARIABLES DE CONTROLE
 
-	listVar = []
+	listVar = getListVarForm()
+	
 	listVarVar = StringVar(value = listVar)
 
 	entryText = ""
@@ -288,10 +288,6 @@ def createFormulaFrame() :
 	window.bind("<Return>", createVar)
 
 
-	listvar = getListVarForm()
-
-	for var in listvar:
-		variableListbox.insert('end', var.lower())
 
 	fwrap = FormuleWrapper()	
 	viewer = TreeViewer(fwrap, graphFrame, formula)
