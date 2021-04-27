@@ -16,33 +16,6 @@ worlds=cl.World("M:0,0")
 
 
 
-def replacerec(father,selected,elem):
-	if not type(father) in [cl.Variable, cl.Top, cl.Bot] :
-		if selected in father.succ:
-			father.succ=[elem if x==selected else x for x in father.succ]
-			return True
-		else:
-			for succ in father.succ:
-				if replacerec(succ,selected,elem):
-					return True
-			return False
-
-	return False							
-
-def replace(selected,elem):
-	global select#temporary
-	global formula#temporary
-	if formula==selected:
-		formula=elem#temporary
-		select=elem#temorary
-		return True
-	else:
-		if replacerec(formula,selected,elem):
-			select=elem#temporary
-			print(formula)
-			return True
-		else:
-			return False
 
 
 def getlistvarrec(current):
@@ -163,6 +136,35 @@ def createFormulaFrame() :
 			if node==select:
 				return 'yellow2'
 			return 'gray77'
+
+
+	def replacerec(father,selected,elem):
+	if not type(father) in [cl.Variable, cl.Top, cl.Bot] :
+		if selected in father.succ:
+			father.succ=[elem if x==selected else x for x in father.succ]
+			return True
+		else:
+			for succ in father.succ:
+				if replacerec(succ,selected,elem):
+					return True
+			return False
+
+	return False							
+
+	def replace(selected,elem):
+		global select#temporary
+		global formula#temporary
+		if formula==selected:
+			formula=elem#temporary
+			select=elem#temorary
+			return True
+		else:
+			if replacerec(formula,selected,elem):
+				select=elem#temporary
+				print(formula)
+				return True
+			else:
+				return False
 
 
 	def createVar():
