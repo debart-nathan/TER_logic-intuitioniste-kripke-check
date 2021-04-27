@@ -87,9 +87,15 @@ class Not(Node):
 
 class Variable(Atom):
 	"""docstring for Variable"""
+
+	varc_counter=0
+
 	def __init__(self, name, value = False):
 		self.name = name
 		self._value = value
+		self.vari_counter=Variable.varc_counter
+		Variable.varc_counter+=1
+
 
 	@property
 	def value(self):
@@ -188,3 +194,4 @@ def valids(formula, rootWorld):
 	return formula.treatment(rootWorld)
 
 Node.classVar = Variable("undefined")
+
