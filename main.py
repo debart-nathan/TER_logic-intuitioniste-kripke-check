@@ -180,29 +180,40 @@ def createFormulaFrame() :
 
 					viewer.drawTree(formula)
 
-					if var.name not in listVar:
-						listVar.insert(0,var.name)
-						listVarVar.set(listVar)
+					if var.name in listVar:
+						listVar.remove(var.name)
+					listVar.insert(0,var.name)
+					listVarVar.set(listVar)
 
+					variableListbox.select_clear(0,"end")
+					variableListbox.select_set(0)
 
 					varnameEntry.delete(0, len(varnameEntry.get()))
 
 					return messagebox.showinfo('message',f'Variable {var.name} crée')
 				else:
-					return messagebox.showinfo('ERROR:',f"La node selectionner n'a pas pue être trouvé")
+					return messagebox.showinfo('ERROR:',f"La node selectionner n'a pas pu être trouvé")
 			else:
 				return messagebox.showinfo('message',f"undefined n'est pas un nom de variable valide")
 		elif  len(variableListbox.curselection())==1:
 
 			var=cl.Variable(listVar[variableListbox.curselection()[0]])
-			if replaceable(var):
-				replace(var)
+			if replace(select,var):
 				viewer.drawTree(formula)
+
+				listVar.remove(var.name)
+				listVar.insert(0,var.name)
+				listVarVar.set(listVar)
+				
+				variableListbox.select_clear(0,"end")
+				variableListbox.select_set(0)
+
+				varnameEntry.delete(0, len(varnameEntry.get()))
 
 				return messagebox.showinfo('message',f'Variable {var.name} assignée.')
 
 			else:
-				return messagebox.showinfo('ERROR:',f'Nœud introuvable dans la formule')
+				return messagebox.showinfo('ERROR:',f"La node selectionner n'a pas pu être trouvé")
 		else:
 			return messagebox.showinfo('message',f'Sélectionnez une variable ou entrez en une nouvelle')
 
