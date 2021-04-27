@@ -1,35 +1,14 @@
-from classes import *
+import classes as cl
 from savefilesystem import *
 from graph_view import TreeViewer,TreeWrapper
-import tkinter as tk
+from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 
-formula=Imp(Not(Variable("a")),Or(Variable("undefined"),Variable("b")))
+formula=cl.Imp(cl.Not(cl.Variable("a")), cl.Or(cl.Variable("undefined"), cl.Variable("b")))
 select=formula
 
-class FormuleWrapper(TreeWrapper):
-	def children(self,node):
-		if not type(node) in [Variable,Top,Bot] :
-			return [succ for succ in node.succ]
-		else:
-			return None
-	def label(self, node):
-		if node.name != 'undefined':
-			return node.name
-		elif node != Node.classVar:
-			return ''
-		else:
-			return None
-	def onClick(self,node):
-		global select
-		select=node
-		viewer.drawTree(formula)
-	
-	def bg(self, node):
-		if node==select:
-			return 'yellow2'
-		return 'gray77'
+
 
 
 	
@@ -38,7 +17,7 @@ class FormuleWrapper(TreeWrapper):
 
 
 def replacerec(father,selected,elem):
-	if not type(father) in [Variable,Top,Bot] :
+	if not type(father) in [cl.Variable, cl.Top, cl.Bot] :
 		if selected in father.succ:
 			father.succ=[elem if x==selected else x for x in father.succ]
 			return True
@@ -73,11 +52,11 @@ def replace(selected,elem):
 def getlistvarrec(current):
 	listvar=[]
 	
-	if type(current)==Variable:
+	if type(current) == cl.Variable:
 		if current.name!='undefined':
 			listvar.append(current.name)
 	
-	elif type(current)!=Top and type(current)!=Bot :
+	elif type(current) != cl.Top and type(current) !=cl.Bot :
 		for succ in current.succ:
 			varsuc=getlistvarrec(succ)
 			for var in varsuc:
@@ -87,13 +66,12 @@ def getlistvarrec(current):
 
 def getlistvar():
 	listvar=[]
-	root=formula
 	
-	if type(root)==Variable:
-		if root.name!='undefined':
-			listvar.append(root.name)
-	elif type(root)!=Top and type(root)!=Bot:
-		for succ in root.succ:
+	if type(formula)== cl.Variable:
+		if formula.name!='undefined':
+			listvar.append(formula.name)
+	elif type(formula) != cl.Top and type(formula) != cl.Bot:
+		for succ in formula.succ:
 			varsuc=getlistvarrec(succ)
 			for var in varsuc:
 				if not (var  in listvar):
@@ -101,98 +79,230 @@ def getlistvar():
 	return listvar
 
 
+def destroyMainWindowSons() :
+	for enfant in window.winfo_children():
+		if isinstance(enfant, ttk.Frame):
+			enfant.destroy()
 
 
-def createVar():
-	if varname.get()!='':
-		if varname.get()!= 'undefined':
-			name= varname.get().lower()
+def createMainFrame() :
+
+	
+	window.title("TER 2020-2021 - Logique Intuitionniste - Menu principal")
+
+	window.columnconfigure(0, weight = 1)
+	window.rowconfigure(0, weight = 1)
+	
+	
+	# DESTRUCTION DE L'ANCIENNE FENETRE
+
+	destroyMainWindowSons()
+
+	
+	# CREATION DU CADRE DE LA FENETRE PRINCIPALE
+
+	mainFrame = ttk.Frame(window, padding = (20, 2, 20, 0))
+	mainFrame.grid(column = 0, row = 0, sticky = (N, S, E, W))
+
+	
+	# TITRE DE LA FENÊTRE PRINCIPALE
+
+	mainFrameTitle = ttk.Label(mainFrame, text = 'Logique Intuitionniste TER 2020-2021', style='Titre.TLabel')
+	mainFrameTitle.grid(column = 0, row = 0, columnspan = 2, sticky =(E, W))
+
+
+	# CONFIGURATION DES ELEMENTS DE LA GRILLE (changement de la taille de la fenêtre)
+
+	mainFrame.columnconfigure(0, weight = 1)
+	mainFrame.rowconfigure(0, weight = 1)
+
+
+
+def createToolbar() :
+	  
+  # BARRE DE MENU
+
+  barreMenu = Menu(window)
+  window['menu'] = barreMenu
+
+  # MENU FICHIER DE LA BARRE DE MENU
+
+  fichierMenu = Menu(barreMenu, tearoff = 0)
+  fichierMenu.add_command(label = 'Créer un nouveau modèle', command = createFormulaFrame)
+  fichierMenu.add_command(label = 'Ouvrir un modèle existant', command = None)
+  fichierMenu.add_command(label = 'Enregistrer le modèle', command = None) 
+  fichierMenu.add_command(label = 'Enregistrer le modèle sous...', command = None) 
+
+  # AJOUT DU MENU FICHIER A LA BARRE DE MENU
+
+  barreMenu.add_cascade(label = 'Fichier', menu = fichierMenu)
+
+
+def createFormulaFrame() :
+
+	global formula
+	global select
+
+
+	class FormuleWrapper(TreeWrapper):
+		def children(self,node):
+			if not type(node) in [cl.Variable, cl.Top, cl.Bot] :
+				return [succ for succ in node.succ]
+			else:
+				return None
+
+		def label(self, node):
+			if node.name != 'undefined':
+				return node.name
+			elif node != cl.Node.classVar:
+				return ''
+			else:
+				return None
+
+		def onClick(self,node):
+			global select
+			select=node
+			viewer.drawTree(formula)
+
+		def bg(self, node):
+			if node==select:
+				return 'yellow2'
+			return 'gray77'
+
+
+	def createVar():
+		if varnameEntry.get()!='':
+			if varnameEntry.get()!= 'undefined':
+				name = varnameEntry.get().lower()
+				#select=getSelect()
+				var = cl.Variable(name)
+				if replace(select,var):
+					viewer.drawTree(formula)
+					variableListbox.delete(0, 'end')
+					listvar2= getlistvar()
+					for var in listvar2:
+						variableListbox.insert('end', var.lower())
+
+					return messagebox.showinfo('message',f'Var {name} created.')
+				else:
+					return messagebox.showinfo('ERROR:',f'Could not find selected node in formula.')
+			else:
+				return messagebox.showinfo('message',f'undefined is not a valid variable name')
+		elif  len(variableListbox.curselection())==1:
 			#select=getSelect()
-			var = Variable(name)
+			var=cl.Variable(listvar[variableListbox.curselection()[0]])
+			name=var.name
 			if replace(select,var):
 				viewer.drawTree(formula)
-				selectvar.delete(0,tk.END)
+				variableListbox.delete(0, 'end')
 				listvar2= getlistvar()
 				for var in listvar2:
-					selectvar.insert(tk.END,var.lower())
-
-				return messagebox.showinfo('message',f'Var {name} created.')
+					variableListbox.insert('end', var.lower())
+				return messagebox.showinfo('message',f'Var {name} assigned.')
 			else:
 				return messagebox.showinfo('ERROR:',f'Could not find selected node in formula.')
+		elif len(variableListbox.curselection()) != 0:
+			return messagebox.showinfo('message',f'please select only one var')
 		else:
-			return messagebox.showinfo('message',f'undefined is not a valid variable name')
-	elif  len(selectvar.curselection())==1:
-		#select=getSelect()
-		var=Variable(listvar[selectvar.curselection()[0]])
-		name=var.name
-		if replace(select,var):
-			viewer.drawTree(formula)
-			selectvar.delete(0,tk.END)
-			listvar2= getlistvar()
-			for var in listvar2:
-				selectvar.insert(tk.END,var.lower())
-			return messagebox.showinfo('message',f'Var {name} assigned.')
-		else:
-			return messagebox.showinfo('ERROR:',f'Could not find selected node in formula.')
-	elif len(selectvar.curselection()) != 0:
-		return messagebox.showinfo('message',f'please select only one var')
-	else:
-		return messagebox.showinfo('message',f'please select item or enter value')
+			return messagebox.showinfo('message',f'please select item or enter value')
+
+
+
+	window.title("TER 2020-2021 - Création d'un modèle")
+
+
+	# DESTRUCTION DE l'ANCIENNE FENETRE
+
+	destroyMainWindowSons()
+
+
+	# CREATION DU CADRE DE LA PAGE CREER FORMULE
+
+	formulaMainFrame = ttk.Frame(window, padding = (20, 2, 20, 0))
+
+
+	# CREATION DES ELEMENTS DU CADRE FORMULE
+
+	formulaTitleFrame = ttk.Label(formulaMainFrame, text='Editeur De Formule', style='Titre.TLabel')
+	graphFrame = ttk.Frame(formulaMainFrame)
+	toolBox = ttk.Notebook(formulaMainFrame)
+	toolsFrame = ttk.Frame(toolBox)
+	variableFrame = ttk.Frame(toolBox)
+	varnameEntry = ttk.Entry(variableFrame)
+	createVarButton = ttk.Button(variableFrame, text='Créer', command = createVar)
+	variableListbox = Listbox(variableFrame, selectmode = 'single', yscrollcommand = True)
+
+
+	# CREATION DES FRAMES DE REMPLISSAGE DES VIDES
+
+
+
+
+	# PLACEMENT DU CADRE (FRAME) PRINCIPAL DANS LA FENETRE (window)
+
+	formulaMainFrame.grid(column = 0, row = 0, sticky=(N, S, E, W))
+
+
+	# PLACEMENT DES ELEMENTS DU CADRE FORMULE DANS LA GRILLE
+
+	formulaTitleFrame.grid(column = 0, row = 0, columnspan = 2, sticky = (N, S, E, W))
+	graphFrame.grid(column = 0, row = 1, sticky = (N, S, E, W), pady = 20, padx = (20, 0))
+
+	toolBox.grid(column = 1, row = 1, sticky = (N, S, E, W), pady = 20, padx = 20)
+	toolsFrame.pack(fill = 'both', expand = True)
+	variableFrame.pack(fill = 'both', expand = True)
+	toolBox.add(toolsFrame, text = 'Outils')
+	toolBox.add(variableFrame, text = 'Variables')
+
+	varnameEntry.grid(column = 0, row = 0, sticky = (N, S, E, W))
+	createVarButton.grid(column = 1, row = 0, sticky = (N, S, E, W))
+	variableListbox.grid(column = 0, row = 1, columnspan = 2, sticky = (N, S, E, W))
+
+
+	# CONFIGURATION DES ELEMENTS DE LA GRILLE (changement de la taille de la fenêtre)
+
+	formulaMainFrame.columnconfigure(0, weight = 1)
+	formulaMainFrame.rowconfigure(1, weight = 1)
+
+
+
+	# PARTIE FONCTIONNELLE
+
+	listvar = getlistvar()
+
+	for var in listvar:
+		variableListbox.insert('end', var.lower())
+
+	fwrap=FormuleWrapper()	
+	viewer = TreeViewer(fwrap, graphFrame, formula)
+
+
+
 
 ###############################################
-#Windows init
+		 # INITIALISATION FENÊTRE #	
 ###############################################
-windows = tk.Tk()
-windows.title("Logique intuitioniste")
+window = Tk()
 
-mainFrame=tk.Frame(windows)
-mainFrame.pack(fill='both',expand=True)
+window.minsize(720, 360)
 
-###############################################
-	#formule viewver
-###############################################
-graphe=tk.Frame(mainFrame, height=500, width=800)
-graphe.grid(row=1,column=1,pady=10,padx=10,sticky=(tk.NW))
 
-fwrap=FormuleWrapper()
-viewer= TreeViewer(fwrap,graphe,formula)
+createToolbar()
+
+createMainFrame()
+
 
 ###############################################
-	#toolbox
+				 # STYLE #
 ###############################################
-boxoutils = ttk.Notebook(mainFrame,width=200, height=400)
-boxoutils.grid(row=1,column=2,pady=10,padx=10,sticky=(tk.NE))
 
-###############################################
-		#outils
-###############################################
-fOutils=ttk.Frame(boxoutils,width=200, height=400)
-fOutils.pack(fill='both',expand=True)
-boxoutils.add(fOutils,text='Outils')
+style = ttk.Style()
+
+style.theme_use('clam')
+
+style.configure('AfficheModele.TFrame', background='white', borderwidth=15, relief='sunken')
+style.configure('Titre.TLabel', font=('arial 20'), relief='groove', borderwidth=10, anchor='center')
 
 
 
-################################################
-		#Custom Variable creation
-################################################
-
-fVariable=ttk.Frame(boxoutils,width=200, height=400)
-fVariable.pack(fill='both',expand=True)
-boxoutils.add(fVariable,text='variable')
-
-
-varname= tk.Entry(fVariable)
-varname.grid(row=1,column=1)
-
-listvar= getlistvar()
-
-selectvar=tk.Listbox(fVariable,selectmode=tk.MULTIPLE,yscrollcommand=True)
-for var in listvar:
-	selectvar.insert(tk.END,var.lower())
-selectvar.grid(row=2,column=1)
-
-setvar= ttk.Button(fVariable, text='assigner', command=createVar).grid(row=1,column=2)
-
- #########################
-
-windows.mainloop()
+window.mainloop()
