@@ -7,7 +7,7 @@ from tkinter import messagebox
 
 formula=cl.Imp(cl.Not(cl.Variable("a")), cl.Or(cl.Variable("undefined"), cl.Variable("b")))
 select=formula
-
+worlds=cl.World("M:0,0")
 
 
 
@@ -27,9 +27,7 @@ def replacerec(father,selected,elem):
 					return True
 			return False
 
-	return False
-				
-				
+	return False							
 
 def replace(selected,elem):
 	global select#temporary
@@ -37,7 +35,6 @@ def replace(selected,elem):
 	if formula==selected:
 		formula=elem#temporary
 		select=elem#temorary
-		print(formula)
 		return True
 	else:
 		if replacerec(formula,selected,elem):
@@ -46,7 +43,6 @@ def replace(selected,elem):
 			return True
 		else:
 			return False
-
 
 
 def getlistvarrec(current):
@@ -117,7 +113,6 @@ def createMainFrame() :
 	mainFrame.rowconfigure(0, weight = 1)
 
 
-
 def createToolbar() :
 	  
   # BARRE DE MENU
@@ -174,7 +169,6 @@ def createFormulaFrame() :
 		if varnameEntry.get()!='':
 			if varnameEntry.get()!= 'undefined':
 				name = varnameEntry.get().lower()
-				#select=getSelect()
 				var = cl.Variable(name)
 				if replace(select,var):
 					viewer.drawTree(formula)
@@ -183,13 +177,12 @@ def createFormulaFrame() :
 					for var in listvar2:
 						variableListbox.insert('end', var.lower())
 
-					return messagebox.showinfo('message',f'Var {name} created.')
+					return messagebox.showinfo('message',f'Var {name} a été crée.')
 				else:
-					return messagebox.showinfo('ERROR:',f'Could not find selected node in formula.')
+					return messagebox.showinfo('ERROR:',f'La node selectioné n\'a pas pu être trouvé.')
 			else:
-				return messagebox.showinfo('message',f'undefined is not a valid variable name')
+				return messagebox.showinfo('Alert',f'Vous ne pouvez pas utiliser Undefined comme nom de variable')
 		elif  len(variableListbox.curselection())==1:
-			#select=getSelect()
 			var=cl.Variable(listvar[variableListbox.curselection()[0]])
 			name=var.name
 			if replace(select,var):
@@ -198,13 +191,13 @@ def createFormulaFrame() :
 				listvar2= getlistvar()
 				for var in listvar2:
 					variableListbox.insert('end', var.lower())
-				return messagebox.showinfo('message',f'Var {name} assigned.')
+				return messagebox.showinfo('message',f'Var {name} a été assignée.')
 			else:
-				return messagebox.showinfo('ERROR:',f'Could not find selected node in formula.')
+				return messagebox.showinfo('ERROR:',f'La node selectioné n\'a pas pu être trouvé.')
 		elif len(variableListbox.curselection()) != 0:
-			return messagebox.showinfo('message',f'please select only one var')
+			return messagebox.showinfo('message',f'S\'il vous plait ne selectionez q\'une variable')
 		else:
-			return messagebox.showinfo('message',f'please select item or enter value')
+			return messagebox.showinfo('Alert',f'S\'il vous plait selectionez une variable ou entrez un nom valide')
 
 
 
@@ -276,6 +269,98 @@ def createFormulaFrame() :
 	fwrap=FormuleWrapper()	
 	viewer = TreeViewer(fwrap, graphFrame, formula)
 
+
+def createModelFrame() :
+
+	global formula
+	global select
+	global worlds
+
+	class ModeleWrapper(TreeWrapper):
+		def children(self,node):
+			if len(self._sons)!=0:
+				return self._sons
+			else:
+				return None
+
+		def label(self, node):
+			if node.name != 'undefined':
+				return node.name
+			else:
+				return None
+
+		def onClick(self,node):
+			global select
+			select=node
+			viewer.drawTree(monde)
+
+		def bg(self, node):
+			if node==select:
+				return 'yellow2'
+			return 'gray77'
+
+
+
+	# DESTRUCTION DE l'ANCIENNE FENETRE
+
+	destroyMainWindowSons()
+
+
+	# CREATION DU CADRE DE LA PAGE CREER FORMULE
+
+	worldMainFrame = ttk.Frame(window, padding = (20, 2, 20, 0))
+
+
+	# CREATION DES ELEMENTS DU CADRE FORMULE
+
+	worldTitleFrame = ttk.Label(worldMainFrame, text='Editeur De Mondes', style='Titre.TLabel')
+	graphFrame = ttk.Frame(worldMainFrame)
+	toolBox = ttk.Notebook(worldMainFrame)
+	toolsFrame = ttk.Frame(toolBox)
+	variableFrame = ttk.Frame(toolBox)
+	varnameEntry = ttk.Entry(variableFrame)
+	createVarButton = ttk.Button(variableFrame, text='Créer', command = createVar)
+	variableListbox = Listbox(variableFrame, selectmode = 'single', yscrollcommand = True)
+
+
+	# CREATION DES FRAMES DE REMPLISSAGE DES VIDES
+
+
+
+
+	# PLACEMENT DU CADRE (FRAME) PRINCIPAL DANS LA FENETRE (window)
+
+	worldMainFrame.grid(column = 0, row = 0, sticky=(N, S, E, W))
+
+
+	# PLACEMENT DES ELEMENTS DU CADRE FORMULE DANS LA GRILLE
+
+	worldTitleFrame.grid(column = 0, row = 0, columnspan = 2, sticky = (N, S, E, W))
+	graphFrame.grid(column = 0, row = 1, sticky = (N, S, E, W), pady = 20, padx = (20, 0))
+
+	toolBox.grid(column = 1, row = 1, sticky = (N, S, E, W), pady = 20, padx = 20)
+	toolsFrame.pack(fill = 'both', expand = True)
+	variableFrame.pack(fill = 'both', expand = True)
+	toolBox.add(toolsFrame, text = 'Outils')
+	toolBox.add(variableFrame, text = 'Variables')
+
+	
+
+
+	# CONFIGURATION DES ELEMENTS DE LA GRILLE (changement de la taille de la fenêtre)
+
+	worldMainFrame.columnconfigure(0, weight = 1)
+	worldMainFrame.rowconfigure(1, weight = 1)
+
+
+	# PARTIE FONCTIONNELLE
+
+	listvar = getlistvar()
+
+	
+
+	fwrap=WorldWrapper()	
+	viewer = TreeViewer(fwrap, graphFrame, world)
 
 
 
