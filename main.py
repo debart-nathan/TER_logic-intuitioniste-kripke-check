@@ -135,7 +135,7 @@ def createFormulaFrame() :
 			if node==select:
 				return 'yellow2'
 			return 'gray77'
-			
+
 
 	def replacerec(father,selected,elem):
 		if not type(father) in [cl.Variable, cl.Top, cl.Bot] :
@@ -181,7 +181,7 @@ def createFormulaFrame() :
 					viewer.drawTree(formula)
 
 					if var.name not in listVar:
-						listVar.append(var.name)
+						listVar.insert(0,var.name)
 						listVarVar.set(listVar)
 
 
