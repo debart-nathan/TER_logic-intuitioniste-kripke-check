@@ -168,16 +168,18 @@ def createFormulaFrame() :
 	
 
 	def succDecide(select,newnode):
-		if not (isinstance(select,(cl.Top,cl.Bot,cl.Variable)) or isinstance(newnode,(cl.Top,cl.Bot,cl.Variable)):
+		if not (isinstance(select,(cl.Top,cl.Bot,cl.Variable)) or isinstance(newnode,(cl.Top,cl.Bot,cl.Variable))):
 			index=[ x for x in range(len(select.succ)) if select.succ[x].name!= "undefined"]
             	
 			if len(index)!=0:
 				popup=Toplevel()
 				popup.minsize(300,200)
 				popup.maxsize(300,200)
+				popup.grab_set()
 				def conserver(indexold,indexnew):
 					for x in range(len(indexold)):
 						newnode.succ[indexnew[x]]=select.succ[indexold[x]]
+					popup.grab_release()
 					popup.destroy()
 					popup.update()
 
@@ -308,7 +310,7 @@ def createFormulaFrame() :
 	graphFrame = ttk.Frame(formulaMainFrame)
 	toolBox = ttk.Notebook(formulaMainFrame)
 	toolsFrame = ttk.Frame(toolBox)
-	variableFrame =popup.destroy() ttk.Frame(toolBox)
+	variableFrame =ttk.Frame(toolBox)
 	varnameEntry = ttk.Entry(variableFrame, textvariable = entryTextVar)
 	createVarButton = ttk.Button(variableFrame, text='Ajouter', command = createVar)
 	variableListbox = Listbox(variableFrame, selectmode = 'browse', yscrollcommand = True, listvariable = listVarVar)
