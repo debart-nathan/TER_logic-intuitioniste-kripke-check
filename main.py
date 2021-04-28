@@ -368,7 +368,6 @@ def createFormulaFrame() :
 
 def createModelFrame() :
 
-	global usrData
 	global select
 	
 
