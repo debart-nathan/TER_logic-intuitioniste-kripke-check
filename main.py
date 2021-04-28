@@ -5,7 +5,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 
-formula=cl.Imp(cl.Not(cl.Variable("a")), cl.Or(cl.Variable("undefined"), cl.Variable("b")))
+formula=cl.Imp(cl.Not(cl.Variable("a")), cl.Or(cl.Variable("undefined"), cl.Imp(cl.Variable("b"),cl.Bot())))
 
 worlds= cl.World("M:0,0")
 #formula = cl.Variable('undefined')
@@ -26,7 +26,7 @@ def getlistvarrec(current):
 		if current.name!='undefined':
 			listvar.append(current.name)
 	
-	elif not isinstance(current, cl.Top) and not isinstance(current, cl.Bot) :
+	elif not isinstance(current, (cl.Top, cl.Bot)) :
 		for succ in current.succ:
 			varsuc=getlistvarrec(succ)
 			for var in varsuc:
@@ -41,7 +41,7 @@ def getListVarForm():
 	if isinstance(formula, cl.Variable):
 		if formula.name!='undefined':
 			listvar.append(formula.name)
-	elif not isinstance(formula, cl.Top) and not isinstance(formula, cl.Bot):
+	elif not isinstance(formula, (cl.Top,cl.Bot)):
 		for succ in formula.succ:
 			varsuc=getlistvarrec(succ)
 			for var in varsuc:
@@ -113,7 +113,7 @@ def createFormulaFrame() :
 
 	class FormuleWrapper(TreeWrapper):
 		def children(self,node):
-			if not type(node) in [cl.Variable, cl.Top, cl.Bot] :
+			if not isinstance(node, (cl.Variable, cl.Top, cl.Bot)) :
 				return [succ for succ in node.succ]
 			else:
 				return None
@@ -138,7 +138,7 @@ def createFormulaFrame() :
 
 
 	def replacerec(father,selected,elem):
-		if not type(father) in [cl.Variable, cl.Top, cl.Bot] :
+		if not isinstance(father,(cl.Variable, cl.Top, cl.Bot)) :
 			if selected in father.succ:
 				father.succ=[elem if x==selected else x for x in father.succ]
 				return True
@@ -165,6 +165,66 @@ def createFormulaFrame() :
 				return True
 			else:
 				return False
+	
+
+	def succDecide(select,newnode):
+		if not (isinstance(select,(cl.Top,cl.Bot,cl.Variable)) or isinstance(newnode,(cl.Top,cl.Bot,cl.Variable)):
+			index=[ x for x in range(len(select.succ)) if select.succ[x].name!= "undefined"]
+            	
+			if len(index)!=0:
+				popup=Toplevel()
+				popup.minsize(300,200)
+				popup.maxsize(300,200)
+				def conserver(indexold,indexnew):
+					for x in range(len(indexold)):
+						newnode.succ[indexnew[x]]=select.succ[indexold[x]]
+					popup.destroy()
+					popup.update()
+
+				label = Label(popup,text="{select.name} a déjà "+len(index)+" fils assigné voulez vous en conservé pour nouveau {newnode.name}")
+				label.grid(column=0,row=0, sticky=NSEW)
+				if isinstance(newnode,cl.Not):
+					if len(index)==1:
+						conserver=Button(popup,command= conserver([index[0]],[0]))
+
+						conserver.grid(row=2,column=0,sticky=NS)
+						
+						
+					elif len(index)==2:
+						conserver1=Button(popup,command= conserver([index[0]],[0]))
+						conserver2=Button(popup,command= conserver([index[1]],[0]))
+
+						conserver1.grid(row=2,column=0,sticky=NS)
+						conserver2.grid(row=2,column=1,sticky=NS)
+				else:
+					if len(index)==1:
+						conserverL=Button(popup,command= conserver([index[0]],[0]))
+						conserverR=Button(popup,command= conserver([index[0]],[1]))
+
+						conserverL.grid(row=2,column=0,sticky=NS)
+						conserverR.grid(row=2,column=1,sticky=NS)
+		
+					
+					elif len(index)==2:
+						conserver1L=Button(popup,command= conserver([index[0]],[0]))
+						conserver1R=Button(popup,command= conserver([index[0]],[1]))
+						conserver2L=Button(popup,command= conserver([index[1]],[0]))
+						conserver2R=Button(popup,command= conserver([index[1]],[1]))
+						conserver=Button(popup,command= conserver(index,[0,1]))
+						conserverRev=Button(popup,command= conserver(index,[1,0]))
+
+						conserver1L.grid(row=2,column=0,sticky=NS)
+						conserver1R.grid(row=2,column=1,sticky=NS)
+						conserver2L.grid(row=2,column=2,sticky=NS)
+						conserver2R.grid(row=2,column=3,sticky=NS)
+						conserver.grid(row=2,column=4,sticky=NS)
+						conserverRev.grid(row=2,column=5,sticky=NS)
+
+						
+					
+				rien=Button(popup,command= conserver([],[]))
+				rien.grid(column=0,row=3,sticky=NS)
+						
 
 	def changeEntryTextFromListbox(*args):
 		if len(variableListbox.curselection()) > 0 :
@@ -204,7 +264,7 @@ def createFormulaFrame() :
 				listVar.remove(var.name)
 				listVar.insert(0,var.name)
 				listVarVar.set(listVar)
-				
+
 				variableListbox.select_clear(0,"end")
 				variableListbox.select_set(0)
 
@@ -248,7 +308,7 @@ def createFormulaFrame() :
 	graphFrame = ttk.Frame(formulaMainFrame)
 	toolBox = ttk.Notebook(formulaMainFrame)
 	toolsFrame = ttk.Frame(toolBox)
-	variableFrame = ttk.Frame(toolBox)
+	variableFrame =popup.destroy() ttk.Frame(toolBox)
 	varnameEntry = ttk.Entry(variableFrame, textvariable = entryTextVar)
 	createVarButton = ttk.Button(variableFrame, text='Ajouter', command = createVar)
 	variableListbox = Listbox(variableFrame, selectmode = 'browse', yscrollcommand = True, listvariable = listVarVar)
