@@ -5,11 +5,12 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 
-formula=cl.Imp(cl.Not(cl.Variable("a")), cl.Or(cl.Variable("undefined"), cl.Imp(cl.Variable("b"),cl.Bot())))
 
-worlds= cl.World("M:0,0")
-#formula = cl.Variable('undefined')
-select = formula
+usrData=Userdata()
+usrData.formula=cl.Imp(cl.Not(cl.Variable("a")), cl.Or(cl.Variable("undefined"), cl.Imp(cl.Variable("b"),cl.Bot())))
+usrData.modele= cl.World("M:0,0")
+#usrData.formula = cl.Variable('undefined')
+select = usrData.formula
 
 
 
@@ -38,11 +39,11 @@ def getlistvarrec(current):
 def getListVarForm():
 	listvar=[]
 	
-	if isinstance(formula, cl.Variable):
-		if formula.name!='undefined':
-			listvar.append(formula.name)
-	elif not isinstance(formula, (cl.Top,cl.Bot)):
-		for succ in formula.succ:
+	if isinstance(usrData.formula, cl.Variable):
+		if usrData.formula.name!='undefined':
+			listvar.append(usrData.formula.name)
+	elif not isinstance(usrData.formula, (cl.Top,cl.Bot)):
+		for succ in usrData.formula.succ:
 			varsuc=getlistvarrec(succ)
 			for var in varsuc:
 				if not (var  in listvar):
@@ -129,7 +130,7 @@ def createFormulaFrame() :
 		def onClick(self,node):
 			global select
 			select=node
-			viewer.drawTree(formula)
+			viewer.drawTree(usrData.formula)
 
 		def bg(self, node):
 			if node==select:
@@ -152,16 +153,15 @@ def createFormulaFrame() :
 
 
 	def replace(selected,elem):
-		global select#temporary
-		global formula#temporary
-		if formula==selected:
-			formula=elem#temporary
-			select=elem#temorary
+		global select
+		if usrData.formula==selected:
+			usrData.formula=elem
+			select=elem
 			return True
 		else:
-			if replacerec(formula,selected,elem):
+			if replacerec(usrData.formula,selected,elem):
 				select=elem#temporary
-				print(formula)
+				print(usrData.formula)
 				return True
 			else:
 				return False
@@ -240,7 +240,7 @@ def createFormulaFrame() :
 				var = cl.Variable(varnameEntry.get().lower())
 				if replace(select,var):
 
-					viewer.drawTree(formula)
+					viewer.drawTree(usrData.formula)
 
 					if var.name in listVar:
 						listVar.remove(var.name)
@@ -261,7 +261,7 @@ def createFormulaFrame() :
 
 			var=cl.Variable(listVar[variableListbox.curselection()[0]])
 			if replace(select,var):
-				viewer.drawTree(formula)
+				viewer.drawTree(usrData.formula)
 
 				listVar.remove(var.name)
 				listVar.insert(0,var.name)
@@ -363,14 +363,14 @@ def createFormulaFrame() :
 
 
 	fwrap = FormuleWrapper()	
-	viewer = TreeViewer(fwrap, graphFrame, formula)
+	viewer = TreeViewer(fwrap, graphFrame, usrData.formula)
 
 
 def createModelFrame() :
 
-	global formula
+	global usrData
 	global select
-	global worlds
+	
 
 	class ModeleWrapper(TreeWrapper):
 		def children(self,node):
