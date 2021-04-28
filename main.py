@@ -1,4 +1,5 @@
 import classes as cl
+import copy
 from savefilesystem import *
 from graph_view import TreeViewer,TreeWrapper
 from tkinter import *
@@ -6,26 +7,6 @@ from tkinter import ttk
 from tkinter import messagebox
 
 # formula=cl.Imp(cl.Not(cl.Variable("a")), cl.Or(cl.Variable("undefined"), cl.Variable("b")))
-
-
-formula = cl.Variable('undefined')
-select = formula
-
-
-
-def replaceablerec(father,selected,elem):
-	if not isinstance(father, [cl.Variable, cl.Top, cl.Bot]) :
-		if selected in father.succ:
-			father.succ=[elem if x==selected else x for x in father.succ]
-			return True
-		else:
-			for succ in father.succ:
-				if replaceablerec(succ,selected,elem):
-					return True
-			return False
-
-	return False
-
 
 
 
@@ -126,7 +107,7 @@ def createFormulaFrame() :
 
 	class FormuleWrapper(TreeWrapper):
 		def children(self,node):
-			if not type(node) in [cl.Variable, cl.Top, cl.Bot] :
+			if not isinstance(node, (cl.Variable, cl.Top, cl.Bot)) :
 				return [succ for succ in node.succ]
 			else:
 				return None
@@ -141,7 +122,8 @@ def createFormulaFrame() :
 
 		def onClick(self,node):
 			global select
-			select=node
+
+			select = node
 			viewer.drawTree(formula)
 
 		def bg(self, node):
@@ -149,62 +131,90 @@ def createFormulaFrame() :
 				return 'yellow2'
 			return 'gray77'
 
-	def replace(elem):
+	def rewind(*args):
+
+		global formula
+		global savedFormula
 		global select
 
-		if isinstance(elem, cl.Variable):
-			select.name = elem.name
+		if savedFormula == None :
+			return messagebox.showinfo('message',f'Pas de retour en arrière possible')
 
-	def replaceable(elem):
-		global select
+		else :
+			formula = savedFormula
+			savedFormula = None
+			updateTextForm
+			viewer.drawTree(formula)
 
-		if isinstance(elem, cl.Variable) :
+	def updateTextForm(*args):
 
-			if isinstance(select, cl.Variable):
-				return True
+		formText = formula.__repr__()
+		formTextVar.set(formText)
+
+	def saveFormula(*args):
+		global savedFormula
+		savedFormula = copy.copy(formula)
+
+	def replace(selected,elem):
+		global select#temporary
+		global formula#temporary
+		global savedFormula
+
+		saveFormula()
+		if formula==selected:
+			formula=elem#temporary
+			select=elem#temorary
+
+			viewer.drawTree(formula)
+			updateTextForm()
+		else:
+			if replacerec(formula,selected,elem):
+				select=elem#temporary
+
+	def replacerec(father,selected,elem):
+
+		if not isinstance(father, (cl.Variable, cl.Top, cl.Bot)) :
+			if selected in father.succ:
+				father.succ=[elem if x==selected else x for x in father.succ]
+				
+				updateTextForm()
+				viewer.drawTree(formula)
 
 			else:
-				return False
+				for succ in father.succ:
+					replacerec(succ,selected,elem)
 
 	def changeEntryTextFromListbox(*args):
 		if len(variableListbox.curselection()) > 0 :
 			entryText = listVar[int(variableListbox.curselection()[0])]
 			entryTextVar.set(entryText)
 
-
 	def createVar(*args):
 		if varnameEntry.get()!='':
 			if varnameEntry.get()!= 'undefined':
-				#select=getSelect()
 				var = cl.Variable(varnameEntry.get().lower())
-				if replaceable(var):
-					replace(var)
+				replace(select, var)
 
-					viewer.drawTree(formula)
+				entryText = ""
+				entryTextVar.set(entryText)
 
-					if var.name not in listVar:
-						listVar.append(var.name)
-						listVarVar.set(listVar)
-
-
-					varnameEntry.delete(0, len(varnameEntry.get()))
-
+				if var.name not in listVar :
+					listVar.append(var.name)
+					listVarVar.set(listVar)
 					return messagebox.showinfo('message',f'Variable {var.name} crée')
-				else:
-					return messagebox.showinfo('ERROR:',f"Le nœud n'est pas vide ou une variable")
+				else :
+					return messagebox.showinfo('message',f'Variable {var.name} assignée')
+
 			else:
 				return messagebox.showinfo('message',f"undefined n'est pas un nom de variable valide")
 		elif  len(variableListbox.curselection())==1:
 
 			var=cl.Variable(listVar[variableListbox.curselection()[0]])
-			if replaceable(var):
-				replace(var)
-				viewer.drawTree(formula)
+	
+			replace(select, var)
 
-				return messagebox.showinfo('message',f'Variable {var.name} assignée.')
+			return messagebox.showinfo('message',f'Variable {var.name} assignée')
 
-			else:
-				return messagebox.showinfo('ERROR:',f'Nœud introuvable dans la formule')
 		else:
 			return messagebox.showinfo('message',f'Sélectionnez une variable ou entrez en une nouvelle')
 
@@ -219,13 +229,18 @@ def createFormulaFrame() :
 
 	# VARIABLES DE CONTROLE
 
-	listVar = []
 	listVarVar = StringVar(value = listVar)
 
 	entryText = ""
 	entryTextVar = StringVar(value = entryText)
 
+	formText = formula.__repr__()
 
+	global formTextVar
+	formTextVar = StringVar(value = formText)
+
+	global savedFormula
+	savedFormula = None
 
 	# CREATION DU CADRE DE LA PAGE CREER FORMULE
 
@@ -234,24 +249,27 @@ def createFormulaFrame() :
 
 	# CREATION DES ELEMENTS DU CADRE FORMULE
 
-	formulaTitleFrame = ttk.Label(formulaMainFrame, text='Editeur de formule', style='Titre.TLabel')
+	formulaTitleFrame = ttk.Label(formulaMainFrame, text='Éditeur de formule', style='Titre.TLabel')
 	graphFrame = ttk.Frame(formulaMainFrame)
 	toolBox = ttk.Notebook(formulaMainFrame)
 	toolsFrame = ttk.Frame(toolBox)
 	variableFrame = ttk.Frame(toolBox)
 	varnameEntry = ttk.Entry(variableFrame, textvariable = entryTextVar)
-	createVarButton = ttk.Button(variableFrame, text='Ajouter', command = createVar)
-	variableListbox = Listbox(variableFrame, selectmode = 'browse', yscrollcommand = True, listvariable = listVarVar)
+	createVarButton = ttk.Button(variableFrame, text = 'Ajouter', command = createVar)
+	variableListbox = Listbox(variableFrame, selectmode = 'browse', listvariable = listVarVar)
+	listboxScrollbar = ttk.Scrollbar(variableListbox, orient = VERTICAL, command = variableListbox.yview)
+	rewindButton = ttk.Button(variableFrame, text = 'Annuler le dernier changement', command = rewind)
+	formulaLabel = ttk.Label(formulaMainFrame, textvariable = formTextVar)
+
 
 
 	# CREATION DES FRAMES DE REMPLISSAGE DES VIDES (si nécessaire)
 
 
 
-
 	# PLACEMENT DU CADRE (FRAME) PRINCIPAL DANS LA FENETRE (window)
 
-	formulaMainFrame.grid(column = 0, row = 0, sticky=(N, S, E, W))
+	formulaMainFrame.grid(column = 0, row = 0, sticky = (N, S, E, W))
 
 
 	# PLACEMENT DES ELEMENTS DU CADRE FORMULE DANS LA GRILLE
@@ -262,12 +280,13 @@ def createFormulaFrame() :
 	toolBox.grid(column = 1, row = 1, sticky = (N, S, E, W), pady = 20, padx = 20)
 	toolsFrame.pack(fill = 'both', expand = True)
 	variableFrame.pack(fill = 'both', expand = True)
-	toolBox.add(toolsFrame, text = 'Outils')
-	toolBox.add(variableFrame, text = 'Variables')
 
+	formulaLabel.grid(column = 1, row = 2, sticky = (N, S, E, W))
 	varnameEntry.grid(column = 0, row = 0, sticky = (N, S, E, W))
 	createVarButton.grid(column = 1, row = 0, sticky = (N, S, E, W))
 	variableListbox.grid(column = 0, row = 1, columnspan = 2, sticky = (N, S, E, W))
+	listboxScrollbar.grid(column = 0, row = 0, sticky = (N, S, E))
+	rewindButton.grid(column = 0, row = 2, columnspan = 2, sticky = (N, S, E, W))
 
 
 	# CONFIGURATION DES ELEMENTS DE LA GRILLE (changement de la taille de la fenêtre)
@@ -278,26 +297,31 @@ def createFormulaFrame() :
 	variableFrame.columnconfigure(0, weight = 1)
 	variableFrame.rowconfigure(1, weight = 1)
 
+	variableListbox.columnconfigure(0, weight = 1)
+	variableListbox.rowconfigure(0, weight = 1)
+
 
 	# PARTIE FONCTIONNELLE
 
+	toolBox.add(toolsFrame, text = 'Outils')
+	toolBox.add(variableFrame, text = 'Variables')
 
-	
+	variableListbox.configure(yscrollcommand = listboxScrollbar.set)
+	# ou : variableListbox['yscrollcommand'] = listboxScrollbar.set
 
 	variableListbox.bind("<<ListboxSelect>>", changeEntryTextFromListbox)
 	variableListbox.bind("<Double-1>", createVar)
 	window.bind("<Return>", createVar)
 
-
-	listvar = getListVarForm()
-
-	for var in listvar:
-		variableListbox.insert('end', var.lower())
-
-	fwrap = FormuleWrapper()	
+	fwrap = FormuleWrapper()
 	viewer = TreeViewer(fwrap, graphFrame, formula)
 
 
+
+formula = cl.Imp(cl.Not(cl.Variable("a")), cl.Or(cl.Variable("undefined"), cl.Variable("b")))
+select = None
+
+listVar = getListVarForm()
 
 
 ###############################################
