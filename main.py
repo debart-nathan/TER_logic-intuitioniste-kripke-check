@@ -463,6 +463,44 @@ def createFormulaFrame() :
 			return messagebox.showinfo('message',f'Sélectionnez une variable ou entrez en une nouvelle')
 
 
+	def createOr():
+		var = cl.Or(cl.Variable("undefined"), cl.Variable("undefined"))
+		succDecide(usrData.select, var)
+		replace(usrData.select, var)
+		viewer.deawTree(usrData.formula)
+	
+	def createAnd():
+		var = cl.And(cl.Variable("undefined"), cl.Variable("undefined"))
+		succDecide(usrData.select, var)
+		replace(usrData.select, var)
+		viewer.deawTree(usrData.formula)
+
+	def createImp():
+		var = cl.Imp(cl.Variable("undefined"), cl.Variable("undefined"))
+		succDecide(usrData.select, var)
+		replace(usrData.select, var)
+		viewer.deawTree(usrData.formula)
+
+	def createNot():
+		var = cl.Not(cl.Variable("undefined"))
+		succDecide(usrData.select, var)
+		replace(usrData.select, var)
+		viewer.deawTree(usrData.formula)
+
+	def createTop():
+		var = cl.Top()
+		replace(usrData.select, var)
+		viewer.deawTree(usrData.formula)
+
+	def createBot():
+		var = cl.Bot()
+		replace(usrData.select, var)
+		viewer.deawTree(usrData.formula)
+	
+	
+
+
+
 	window.title("TER 2020-2021 - Logique Intuitionniste - Éditeur de formule")
 
 
@@ -493,6 +531,16 @@ def createFormulaFrame() :
 	graphFrame = ttk.Frame(formulaMainFrame)
 	toolBox = ttk.Notebook(formulaMainFrame)
 	toolsFrame = ttk.Frame(toolBox)
+
+	Bouton_Or = ttk.Button(toolsFrame, text = "Or", command = createOr)
+	Bouton_And = ttk.Button(toolsFrame, text = "And", command = createAnd)
+	Bouton_Imp = ttk.Button(toolsFrame, text = "Imp", command = createImp)
+	Bouton_Not = ttk.Button(toolsFrame, text = "Not", command = createNot)
+	Bouton_Top = ttk.Button(toolsFrame, text = "Top", command = createTop)
+	Bouton_Bot = ttk.Button(toolsFrame, text = "Bot", command = createBot)
+
+
+
 	variableFrame =ttk.Frame(toolBox)
 	varnameEntry = ttk.Entry(variableFrame, textvariable = entryTextVar)
 	createVarButton = ttk.Button(variableFrame, text='Ajouter', command = createVar)
@@ -519,6 +567,14 @@ def createFormulaFrame() :
 	variableFrame.pack(fill = 'both', expand = True)
 	toolBox.add(toolsFrame, text = 'Outils')
 	toolBox.add(variableFrame, text = 'Variables')
+
+	Bouton_Not.grid(column = 0, row = 0, sticky = (N, S, E, W))
+	Bouton_Or.grid(column = 0, row = 1, sticky = (N, S, E, W))
+	Bouton_And.grid(column = 0, row = 2, sticky = (N, S, E, W))
+	Bouton_Imp.grid(column = 0, row = 3, sticky = (N, S, E, W))
+	Bouton_Top.grid(column = 0, row = 4, sticky = (N, S, E, W))
+	Bouton_Bot.grid(column = 0, row = 5, sticky = (N, S, E, W))
+
 
 	varnameEntry.grid(column = 0, row = 0, sticky = (N, S, E, W))
 	createVarButton.grid(column = 1, row = 0, sticky = (N, S, E, W))
