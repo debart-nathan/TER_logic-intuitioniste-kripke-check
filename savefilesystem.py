@@ -42,24 +42,27 @@ def reconstructClasses(treeHolder):
 
 class Userdata(object):
 	"""docstring for Userdata"""
-	def __init__(self, formula = None, model = None):
+	def __init__(self, formula = None, model = None,select=None,currentFFile=None,currentWFile=None):
 
 		self.model = model
 		self.formula = formula
 		self.existingDirs = os.listdir("./assets/userdata/")
+		self.currentFFile=currentFFile
+		self.currentWFile=currentWFile
+		self.select=select
 
-	def save(self, fileset):
-		if not(self.model is None):
-			with open("./assets/userdata/"+fileset+".model","wb") as file:
+	def save(self, ffileset=None,wfileset=None):
+		if not(self.model is None)and not (wfileset is None):
+			with open("./assets/userdata/"+wfileset+".model","wb") as file:
 				pickle.dump(self.model,file)
-		if not(self.formula is None):
-			with open("./assets/userdata/"+fileset+".formula","wb") as file:
+		if not(self.formula is None) and not (ffileset is None):
+			with open("./assets/userdata/"+ffileset+".formula","wb") as file:
 				pickle.dump(self.formula,file)
 
-	def load(self, fileset, defaultDataFolder = False, formula = True, model = True):
-		if formula :
-			with open("./assets/"+("data" if defaultDataFolder else "userdata")+"/"+fileset+".formula","rb") as file:
+	def load(self, ffileset=None, wfileset=None, defaultDataFolder = False):
+		if not (ffileset is None) :
+			with open("./assets/"+("data" if defaultDataFolder else "userdata")+"/"+ffileset+".formula","rb") as file:
 				self.formula = pickle.load(file)
-		if model :
-			with open("./assets/"+("data" if defaultDataFolder else "userdata")+"/"+fileset+".model","rb") as file:
+		if not (wfileset is None) :
+			with open("./assets/"+("data" if defaultDataFolder else "userdata")+"/"+wfileset+".model","rb") as file:
 				self.model = pickle.load(file)
