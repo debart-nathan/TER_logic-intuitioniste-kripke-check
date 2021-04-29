@@ -597,8 +597,7 @@ def createModelFrame() :
 	toolsFrame = ttk.Frame(toolBox)
 	variableFrame = ttk.Frame(toolBox)
 	varnameEntry = ttk.Entry(variableFrame)
-	createVarButton = ttk.Button(variableFrame, text='Créer', command = createVar)
-	variableListbox = Listbox(variableFrame, selectmode = 'single', yscrollcommand = True)
+	
 
 
 	# CREATION DES FRAMES DE REMPLISSAGE DES VIDES
