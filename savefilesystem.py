@@ -53,7 +53,7 @@ class Userdata(object):
 
 	def save(self, ffileset=None,wfileset=None):
 		if not(self.model is None)and not (wfileset is None):
-				with open("./assets/userdata/"+wfileset+".model","wb") as file:
+			with open("./assets/userdata/"+wfileset+".model","wb") as file:
 				pickle.dump(self.model,file)
 		if not(self.formula is None) and not (ffileset is None):
 			with open("./assets/userdata/"+ffileset+".formula","wb") as file:
