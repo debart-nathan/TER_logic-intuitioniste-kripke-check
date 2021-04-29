@@ -100,6 +100,7 @@ def saveNInter():
 		popup.destroy()
 		popup.update()
 	def save():
+		currentFile=entry.get()
 		if currentFile !="":
 			usrData.save(ffileset=currentFile,wfileset=currentFile)
 			usrData.currentFFile=currentFile
@@ -137,6 +138,7 @@ def saveNFromula():
 		popup.destroy()
 		popup.update()
 	def save():
+		currentFile=entry.get()
 		if currentFile !="":
 			usrData.save(ffileset=currentFile)
 			usrData.currentFFile=currentFile
@@ -171,6 +173,7 @@ def saveNWorld():
 		popup.destroy()
 		popup.update()
 	def save():
+		currentFile=entry.get()
 		if currentFile !="":
 			usrData.save(wfileset=currentFile)
 			usrData.currentWFile=currentFile
