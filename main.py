@@ -4,14 +4,188 @@ from graph_view import TreeViewer,TreeWrapper
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
+from tkinter import filedialog
+import os
+
 
 
 usrData=Userdata()
-usrData.formula=cl.Imp(cl.Not(cl.Variable("a")), cl.Or(cl.Variable("undefined"), cl.Imp(cl.Variable("b"),cl.Bot())))
-usrData.modele= cl.World("M:0,0")
-#usrData.formula = cl.Variable('undefined')
-select = usrData.formula
 
+
+
+def createInter():
+	
+	usrData.modele= cl.World("M:0,0")
+	usrData.formula = cl.Variable('undefined')
+	usrData.select = usrData.formula
+	createFormulaFrame()
+
+def openFormula():
+	currentFile=filedialog.askopenfilename(initialdir="./assets/userdata/" ,filetypes=[("formula file","*.formula")])
+	if currentFile!= ():
+		currentFile=os.path.split(currentFile)
+		if currentFile[0]!=(os.getcwd()+"/assets/userdata"):
+			messagebox.showinfo('Erreur de Dossier',f'prenez un fichier dans ./asset/userdata')
+		else:
+			currentFile=currentFile[1].rsplit( ".", 1 )[ 0 ]
+			usrData.load(ffileset=currentFile)
+			usrData.currentFFile=currentFile	
+	
+			usrData.select=usrData.formula
+
+			if usrData.model==None:
+				usrData.model=cl.World("M:0,0")
+			createFormulaFrame()
+
+def openWorld():
+	currentFile= filedialog.askopenfilename(initialdir="./assets/userdata/" ,filetypes=[("model file","*.model")])
+	if currentFile!= ():
+		currentFile=os.path.split(currentFile)
+		if currentFile[0]!=(os.getcwd()+"/assets/userdata"):
+			messagebox.showinfo('Erreur de Dossier',f'prenez un fichier dans ./asset/userdata')
+		else:
+			currentFile=currentFile[1].rsplit( ".", 1 )[ 0 ]
+			usrData.load(wfileset=currentFile)
+
+			usrData.currentWFile=currentFile
+
+			if usrData.formula==None:
+				usrData.formula=cl.Variable("undefined")
+
+			if bienConstruite():
+				usrData.select=usrData.model
+				createModelFrame()
+			else:
+				usrData.select=usrData.formula
+				createFormulaFrame()
+	
+
+def openInter():
+	currentFile= filedialog.askopenfilename(initialdir="./assets/userdata/" ,filetypes=[("formula file","*.formula")])
+	currentFile2= filedialog.askopenfilename(initialdir="./assets/userdata/" ,filetypes=[("model file","*.model")])
+	if currentFile!= () or currentFile2!= ():
+		currentFile=os.path.split(currentFile)
+		currentFile2=os.path.split(currentFile2)
+		if (currentFile[0] or currentFile2[0])!=(os.getcwd()+"/assets/userdata"):
+			messagebox.showinfo('Erreur de Dossier',f'prenez les fichier dans ./asset/userdata')
+		else:
+			currentFile=currentFile[1].rsplit( ".", 1 )[ 0 ]
+			currentFile2=currentFile2[1].rsplit( ".", 1 )[ 0 ]
+
+			usrData.load(ffileset=currentFile)
+			usrData.currentFFile=currentFile
+
+			usrData.load(wfileset=currentFile2)
+			usrData.currentWFile=currentFile2
+
+			usrData.select=usrData.formula
+			createFormulaFrame()
+
+
+
+def	saveCInter():
+	if usrData.currentFFile ==None or usrData.currentWFile ==None:
+		messagebox.showinfo('Alert',f'Au moins un des fichers (formule/model) n\'est pas ouvert')
+	else:
+		usrData.save(ffileset=usrData.currentFFile,wfilset=usrData.currentWFile)
+
+def saveNInter():
+	popup=Toplevel()
+	popup.grab_set()
+	popup.title("Choisiser un nom")
+	currentFile=""
+
+	def close():
+		popup.grab_release()
+		popup.destroy()
+		popup.update()
+	def save():
+		if currentFile !="":
+			usrData.save(ffileset=currentFile,wfileset=currentFile)
+			usrData.currentFFile=currentFile
+			usrData.currentWFile=currentFile
+			close()
+		else:
+			t=Label(popup,text ="le nom ne peut pas être vide",fg="red")
+			t.grid(column=0,row=1)
+	
+	b1=Button(popup,text="save",command= save)
+	b2=Button(popup,text="cancel",command=close)
+	entry= ttk.Entry(popup, textvariable = currentFile)
+	
+	entry.grid(column=0, row = 0, sticky = (N, S, E, W))
+	b1.grid(column=0, row = 2, sticky = (N, S, E, W))
+	b2.grid(column=1, row = 2, sticky = (N, S, E, W))
+	
+	
+
+
+def	saveCFormula():
+	if usrData.currentFFile ==None :
+		messagebox.showinfo('Alert',f'Aucune fichier formule ouvert')
+	else:
+		usrData.save(ffileset=usrData.currentFFile)
+
+def saveNFromula():
+	popup=Toplevel()
+	popup.grab_set()
+	popup.title("Choisiser un nom")
+	currentFile=""
+
+	def close():
+		popup.grab_release()
+		popup.destroy()
+		popup.update()
+	def save():
+		if currentFile !="":
+			usrData.save(ffileset=currentFile)
+			usrData.currentFFile=currentFile
+			close()
+		else:
+			t=Label(popup,text ="le nom ne peut pas être vide",fg="red")
+			t.grid(column=0,row=1)
+	
+	b1=Button(popup,text="save",command= save)
+	b2=Button(popup,text="cancel",command=close)
+	entry= ttk.Entry(popup, textvariable = currentFile)
+	
+	entry.grid(column=0, row = 0, sticky = (N, S, E, W))
+	b1.grid(column=0, row = 2, sticky = (N, S, E, W))
+	b2.grid(column=1, row = 2, sticky = (N, S, E, W))
+
+
+def	saveCWorld():
+	if  usrData.currentWFile ==None:
+		messagebox.showinfo('Alert',f'Aucun fichier model ouvert')
+	else:
+		usrData.save(wfilset=usrData.currentWFile)
+
+def saveNWorld():
+	popup=Toplevel()
+	popup.grab_set()
+	popup.title("Choisiser un nom")
+	currentFile=""
+
+	def close():
+		popup.grab_release()
+		popup.destroy()
+		popup.update()
+	def save():
+		if currentFile !="":
+			usrData.save(wfileset=currentFile)
+			usrData.currentWFile=currentFile
+			close
+		else:
+			t=Label(popup,text ="le nom ne peut pas être vide",fg="red")
+			t.grid(column=0,row=1)
+	
+	b1=Button(popup,text="save",command= save)
+	b2=Button(popup,text="cancel",command=close)
+	entry= ttk.Entry(popup, textvariable = currentFile)
+	
+	entry.grid(column=0, row = 0, sticky = (N, S, E, W))
+	b1.grid(column=0, row = 2, sticky = (N, S, E, W))
+	b2.grid(column=1, row = 2, sticky = (N, S, E, W))
 
 
 
@@ -93,20 +267,26 @@ def createToolbar() :
 	  
   # BARRE DE MENU
 
-  barreMenu = Menu(window)
-  window['menu'] = barreMenu
+	barreMenu = Menu(window)
+	window['menu'] = barreMenu
 
-  # MENU FICHIER DE LA BARRE DE MENU
+	# MENU FICHIER DE LA BARRE DE MENU
 
-  fichierMenu = Menu(barreMenu, tearoff = 0)
-  fichierMenu.add_command(label = 'Créer une nouvelle formule', command = createFormulaFrame)
-  fichierMenu.add_command(label = 'Ouvrir un modèle existant', command = None)
-  fichierMenu.add_command(label = 'Enregistrer le modèle', command = None) 
-  fichierMenu.add_command(label = 'Enregistrer le modèle sous...', command = None) 
+	fichierMenu = Menu(barreMenu, tearoff = 0)
+	fichierMenu.add_command(label = 'Créer une nouvelle interprétation', command = createInter)
+	fichierMenu.add_command(label = 'Ouvrir une interprétation existante', command = openInter)
+	fichierMenu.add_command(label = 'Ouvrir une formule existante', command = openFormula)
+	fichierMenu.add_command(label = 'Ouvrir un modele existant', command = openWorld)
+	fichierMenu.add_command(label = "Enregistrer l'interpétation", command = saveCInter) 
+	fichierMenu.add_command(label = "Enregistrer l'interprétation sous...", command = saveNInter)
+	fichierMenu.add_command(label = "Enregistrer la formule", command = saveCFormula) 
+	fichierMenu.add_command(label = "Enregistrer la formule sous...", command = saveNFromula)
+	fichierMenu.add_command(label = "Enregistrer le model", command = saveCWorld) 
+	fichierMenu.add_command(label = "Enregistrer le model sous...", command = saveNWorld)
 
-  # AJOUT DU MENU FICHIER A LA BARRE DE MENU
+	# AJOUT DU MENU FICHIER A LA BARRE DE MENU
 
-  barreMenu.add_cascade(label = 'Fichier', menu = fichierMenu)
+	barreMenu.add_cascade(label = 'Fichier', menu = fichierMenu)
 
 
 def createFormulaFrame() :
@@ -128,12 +308,12 @@ def createFormulaFrame() :
 				return None
 
 		def onClick(self,node):
-			global select
-			select=node
+			usrData.select
+			usrData.select=node
 			viewer.drawTree(usrData.formula)
 
 		def bg(self, node):
-			if node==select:
+			if node==usrData.select:
 				return 'yellow2'
 			return 'gray77'
 
@@ -153,14 +333,14 @@ def createFormulaFrame() :
 
 
 	def replace(selected,elem):
-		global select
+	
 		if usrData.formula==selected:
 			usrData.formula=elem
-			select=elem
+			usrData.select=elem
 			return True
 		else:
 			if replacerec(usrData.formula,selected,elem):
-				select=elem#temporary
+				usrData.select=elem
 				print(usrData.formula)
 				return True
 			else:
@@ -187,33 +367,33 @@ def createFormulaFrame() :
 				label.grid(column=0,row=0, sticky=NSEW)
 				if isinstance(newnode,cl.Not):
 					if len(index)==1:
-						conserver=Button(popup,command= conserver([index[0]],[0]))
+						conserver=Button(popup,text="Conserver le fils",command= conserver([index[0]],[0]))
 
 						conserver.grid(row=2,column=0,sticky=NS)
 						
 						
 					elif len(index)==2:
-						conserver1=Button(popup,command= conserver([index[0]],[0]))
-						conserver2=Button(popup,command= conserver([index[1]],[0]))
+						conserver1=Button(popup,text="Conserver le fils gauche",command= conserver([index[0]],[0]))
+						conserver2=Button(popup,text="Conserver le fils droit",command= conserver([index[1]],[0]))
 
 						conserver1.grid(row=2,column=0,sticky=NS)
 						conserver2.grid(row=2,column=1,sticky=NS)
 				else:
 					if len(index)==1:
-						conserverL=Button(popup,command= conserver([index[0]],[0]))
-						conserverR=Button(popup,command= conserver([index[0]],[1]))
+						conserverL=Button(popup,text="Conserver le fils et le placer a gauche",command= conserver([index[0]],[0]))
+						conserverR=Button(popup,text="Conserver le fils et le placer a droite",command= conserver([index[0]],[1]))
 
 						conserverL.grid(row=2,column=0,sticky=NS)
 						conserverR.grid(row=2,column=1,sticky=NS)
 		
 					
 					elif len(index)==2:
-						conserver1L=Button(popup,command= conserver([index[0]],[0]))
-						conserver1R=Button(popup,command= conserver([index[0]],[1]))
-						conserver2L=Button(popup,command= conserver([index[1]],[0]))
-						conserver2R=Button(popup,command= conserver([index[1]],[1]))
-						conserver=Button(popup,command= conserver(index,[0,1]))
-						conserverRev=Button(popup,command= conserver(index,[1,0]))
+						conserver1L=Button(popup,text="Conserver le fils gauche et le placer a gauche",command= conserver([index[0]],[0]))
+						conserver1R=Button(popup,text="Conserver le fils gauche et le placer a droite",command= conserver([index[0]],[1]))
+						conserver2L=Button(popup,text="Conserver le fils droit et le placer a gauche",command= conserver([index[1]],[0]))
+						conserver2R=Button(popup,text="Conserver le fils droit et le placer a droite",command= conserver([index[1]],[1]))
+						conserver=Button(popup,text="Conserver les deux",command= conserver(index,[0,1]))
+						conserverRev=Button(popup,text="Conserver les deux mais inversé leurs position",command= conserver(index,[1,0]))
 
 						conserver1L.grid(row=2,column=0,sticky=NS)
 						conserver1R.grid(row=2,column=1,sticky=NS)
@@ -224,7 +404,7 @@ def createFormulaFrame() :
 
 						
 					
-				rien=Button(popup,command= conserver([],[]))
+				rien=Button(popup,text="Ne rien conserver",command= conserver([],[]))
 				rien.grid(column=0,row=3,sticky=NS)
 						
 
@@ -238,7 +418,7 @@ def createFormulaFrame() :
 		if varnameEntry.get()!='':
 			if varnameEntry.get()!= 'undefined':
 				var = cl.Variable(varnameEntry.get().lower())
-				if replace(select,var):
+				if replace(usrData.select,var):
 
 					viewer.drawTree(usrData.formula)
 
@@ -260,7 +440,7 @@ def createFormulaFrame() :
 		elif  len(variableListbox.curselection())==1:
 
 			var=cl.Variable(listVar[variableListbox.curselection()[0]])
-			if replace(select,var):
+			if replace(usrData.select,var):
 				viewer.drawTree(usrData.formula)
 
 				listVar.remove(var.name)
@@ -368,7 +548,7 @@ def createFormulaFrame() :
 
 def createModelFrame() :
 
-	global select
+
 	
 
 	class ModeleWrapper(TreeWrapper):
@@ -385,12 +565,12 @@ def createModelFrame() :
 				return None
 
 		def onClick(self,node):
-			global select
-			select=node
+			
+			usrData.select=node
 			viewer.drawTree(monde)
 
 		def bg(self, node):
-			if node==select:
+			if node==usrData.select:
 				return 'yellow2'
 			return 'gray77'
 
