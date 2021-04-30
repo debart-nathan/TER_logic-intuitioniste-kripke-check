@@ -125,6 +125,8 @@ def saveNInter():
 			usrData.save(ffileset=currentFile,wfileset=currentFile)
 			usrData.currentFFile=currentFile
 			usrData.currentWFile=currentFile
+			mainFrameName=window.title().rsplit('-',1)[1]
+			defTitle(mainFrameName)
 			close()
 		else:
 			t=Label(popup,text ="le nom ne peut pas être vide",fg="red")
@@ -152,6 +154,7 @@ def saveNFromula():
 	popup.grab_set()
 	popup.title("Choisiser un nom")
 	currentFile=""
+	
 
 	def close():
 		popup.grab_release()
@@ -162,6 +165,8 @@ def saveNFromula():
 		if currentFile !="":
 			usrData.save(ffileset=currentFile)
 			usrData.currentFFile=currentFile
+			mainFrameName=window.title().rsplit('-',1)[1]
+			defTitle(mainFrameName)
 			close()
 		else:
 			t=Label(popup,text ="le nom ne peut pas être vide",fg="red")
@@ -197,6 +202,8 @@ def saveNWorld():
 		if currentFile !="":
 			usrData.save(wfileset=currentFile)
 			usrData.currentWFile=currentFile
+			mainFrameName=window.title().rsplit('-',1)[1]
+			defTitle(mainFrameName)
 			close
 		else:
 			t=Label(popup,text ="le nom ne peut pas être vide",fg="red")
