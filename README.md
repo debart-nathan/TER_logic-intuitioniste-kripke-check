@@ -1,24 +1,1 @@
-#Ter L3 Logique Intuitioniste
-
-##Bienvenu sur notres projet.
-Le but de ce projet et de trouvÃ© la valeur dune interpretation de la logique intuitioniste utilisant un model de kripke
-et ce a l'aide de l'application si incluse
-
-##afin d'utiliser cette application vous aurais besoin:
- - de la derniÃ¨re version de python3
- - du package tkinter pour python3 (vous trouverez un guide d'instalation en suivant ce lien https://tkdocs.com/tutorial/install.html)
-
-
-
-
-
-
-##disclamer:
-  ce projet contien une version modifier du fichier treeview.py
-  trouvÃ© :https://resources.oreilly.com/examples/9780596000851 
-  dans le dossier: 9780596000851/010201_1353/Examples/PP2E/Dstruct/TreeView
-
-###avec pour mension lÃ©gal:
-   O'Reilly books are here to help you get your job done. In general, you may use the code in O'Reilly books in your programs   and documentation. You do not need to contact us for permission unless you're reproducing a significant portion of the code. For  example, writing a program that uses several chunks of code from our books does not require permission. Answering a question by citing our books and quoting example code does not require permission. On the other hand, selling or distributing a CD-ROM of examples from O'Reilly books does require permission. Incorporating a significant amount of example code from our books into your product's documentation does require permission.
-
-
+MêËÜº Š«"{nŠØ¨+-x÷§ºË«‹kzÊk¢7­-æîµ×œzšèë^µ×­®‹¯•«Ú•ë«véŞŠ{^®šŞµ«b¢w^•©h‚*®z)íº+b¢x¬µë­ŠX¬j{njzW^’¸©‘ç­qæ¥j'^uéZ¦™bq«b¢{"Šw%ºÇš~)İºØ¥ŠÇ«qëmyªi–'¶*'¾‹¬jêÚŠÆŞ²ˆ§uéZuêçŠ·¯z»"¢w^§+a¢}İº–œ‘¨¶H§µêé¢êéÊØhŸ{èºËk¢ëŞ­ìî¢uçbËZ•«b¢w§²è¯j{\zXm¦Ïÿ¶GhrÇ(›ûn¶Šâj_âËZ–XmšWb±ÉZ™êÜzšèë\¢{bz{§z÷«²*'š‡b~'«vçâr®ÚŞzøÂœ­®‹¯†Ûi³ÿëzÊ.­Ç¬¢·¢–\œ¢oŞÅ©©•ë?÷¿4çŞ´ÓO9ÕÖ§²W¢Ë"z¿{óN}ëM4óÓ]6Ó]wçÄÅ©©•ë?<ı„ü;-®ç-ı:ŞyXÁ«Şrš.®g§²*'–¥9¢–\›¢‰,j·¡z·­¢¥§*.ër¢êã¡·hâ'éŞ­©r¢éšÊë¶œ¡×¢œä^ŠYrnŠ$²)ò¢êé®ˆ+jk×hréÖ­Š‰Ø¢çh‹gyçm¡Ê'µ§-ºÇè®—«š+,Š‰îW¬³*.­êŞ¦º¹È§«"‚xŸ‰Æ§¶š+¶*'¡ûayÊxZ+{¦¦W°®+b©®ˆ+jkajÛ¬zË½êÚ•ÈnK(}Êyúèš‹«nŠ$±Ú²z-­ê®Š·©z¹¢²È¨œ	ìÁêâª¹ë-Š‰ÛÉÈ­Šx(º¶è¢KÚ®¢Ø§ìZš™^r‡^v‡¬‹kz«¢­ê^®h¬²*':{az‹az¸ZÛ–X§‚ŠİŠËk‰»­Šx4N2‡ŞÅ©©•ë®‰Eè¥—&è¢K¡ë+z«¢­ê^®h¬²*'"w(®š+jØ§«"‚xŸ‰Æ§µ©¨º{h}ìZš™^r‡^~º&¢êÛ¢‰,Š{hÊ‹«¦º¹Ëlv‡.™éíjØ¨Ú²·ªº*Ş¥êæŠË"¢
