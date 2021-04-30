@@ -72,12 +72,12 @@ def openWorld():
 			if usrData.formula==None:
 				usrData.formula=cl.Variable("undefined")
 
-			if bienConstruite():
-				usrData.select=usrData.model
-				createModelFrame()
-			else:
-				usrData.select=usrData.formula
-				createFormulaFrame()
+	#		if bienConstruite():
+			usrData.select=usrData.model
+			createModelFrame()
+	#		else:
+	#			usrData.select=usrData.formula
+	#			createFormulaFrame()
 	
 
 def openInter():
@@ -666,16 +666,53 @@ def createModelFrame() :
 			return 'gray77'
 
 	def addSon():
-		newSonName = usrData.select.name + '-'+len(usrData.select._sons)
-		usrData.select.sons(newSonName)
-		viewer.drawTree(usrData.World)
+		newSonName = usrData.select.name + '-'+str(len(usrData.select._sons))
+		usrData.select.sons = newSonName
+		viewer.drawTree(usrData.model)
 
 
-	#TODO removeSelf():
-	#def removeSelf():
-	#	index = 
+	
+	def removeSelfAlt(current):
+		if usrData.select in current._sons :
+			temp = []
+			for i in current._sons :
+				if i != usrData.select :
+					temp.append(i)
+			current._sons = temp
+			viewer.drawTree(usrData.model)
+		else :
+			for j in current._sons :
+				removeSelfAlt(j)
+
+	def removeSelf():
+		if (usrData.select != usrData.model):
+			removeSelfAlt(usrData.model)
+		else :
+			messagebox.showinfo("",f"Vous ne pouvez pas supprimer le monde racine")
 
 	#TODO addVariableToWorld
+	def addVariableToWorld():
+
+		def valider ():
+			usrData.select.vars = [listvar[i] for i in frameCheck.curselection()]
+
+		frameCheck = Listbox(variableFrame, selectmode = MULTIPLE, yscrollcommand = True)
+		frameCheck.grid(column = 0, row = 1, sticky = (N, S, E, W))
+		listvar = getListVarForm()
+		for i in range(len(listvar)) :
+			frameCheck.insert(i,listvar[i])
+			if listvar[i] in usrData.select._vars :
+				frameCheck.selection_set(i)
+		variablesbutton = ttk.Button(variableFrame, text = "Valider", command = valider)
+		variablesbutton.grid(column = 0, row = 2 , sticky = (N, S, E, W))
+
+
+
+
+
+
+
+
 
 	defTitle("Éditeur de Model")
 	# DESTRUCTION DE l'ANCIENNE FENETRE
@@ -698,10 +735,10 @@ def createModelFrame() :
 
 	Bouton_AjoutFils = ttk.Button(toolsFrame, text = "Add son", command = addSon)
 	Bouton_RetraitSelf = ttk.Button(toolsFrame, text = "Remove", command = removeSelf)
-	Bouton_Var = ttk.Button(toolsFrame, text = "Add Variable", command = addVariableToWorld)
 
 	variableFrame = ttk.Frame(toolBox)
 
+	Bouton_Var = ttk.Button(variableFrame, text = "Add Variable", command = addVariableToWorld)
 
 
 
@@ -733,7 +770,7 @@ def createModelFrame() :
 
 	Bouton_AjoutFils.grid(column = 0, row = 0, sticky = (N, S, E, W))
 	Bouton_RetraitSelf.grid(column = 0, row = 1, sticky = (N, S, E, W))
-	Bouton_Var.grid(column = 0, row = 2, sticky = (N, S, E, W))
+	Bouton_Var.grid(column = 0, row = 0, sticky = (N, S, E, W))
 	
 
 
