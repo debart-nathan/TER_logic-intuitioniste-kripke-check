@@ -11,20 +11,23 @@ import os
 
 usrData=Userdata()
 
-def showFile():
-	
+def defTitle(activeFrame):
 
-	text= "Fichier formule ouvert: "
+	text= "formule : "
 	if not (usrData.currentFFile is None):
 		text+=(usrData.currentFFile+".formula")
 	else:
-		text+="aucun" 
+		text+=" aucun " 
 
-	text+=", FichierMonde ouvert: "
+	text+="| model : "
 	if not (usrData.currentWFile is None):
 		text+=(usrData.currentWFile+".model")
 	else:
-		text+="aucun"
+		text+=" aucun "
+	text+=" - TER 2020-2021 - Logique Intuitionniste - "
+	text+= activeFrame
+	window.title(text)
+
 
 	
 	
@@ -254,7 +257,7 @@ def destroyMainWindowSons() :
 def createMainFrame() :
 
 	
-	window.title("TER 2020-2021 - Logique Intuitionniste - Menu principal")
+	defTitle("Menu principal")
 
 	window.columnconfigure(0, weight = 1)
 	window.rowconfigure(0, weight = 1)
@@ -366,7 +369,6 @@ def createFormulaFrame() :
 		else:
 			if replacerec(usrData.formula,selected,elem):
 				usrData.select=elem
-				print(usrData.formula)
 				return True
 			else:
 				return False
@@ -523,7 +525,7 @@ def createFormulaFrame() :
 
 
 
-	window.title("TER 2020-2021 - Logique Intuitionniste - Éditeur de formule")
+	defTitle("Éditeur de formule")
 
 
 	# DESTRUCTION DE l'ANCIENNE FENETRE
@@ -657,7 +659,7 @@ def createModelFrame() :
 			return 'gray77'
 
 
-	window.title("TER 2020-2021 - Logique Intuitionniste - Éditeur de Model")
+	defTitle("Éditeur de Model")
 	# DESTRUCTION DE l'ANCIENNE FENETRE
 
 	destroyMainWindowSons()
