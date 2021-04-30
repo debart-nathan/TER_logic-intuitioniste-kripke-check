@@ -11,7 +11,27 @@ import os
 
 usrData=Userdata()
 
+def defTitle(activeFrame):
 
+	text= "formule : "
+	if not (usrData.currentFFile is None):
+		text+=(usrData.currentFFile+".formula")
+	else:
+		text+=" aucun " 
+
+	text+="| model : "
+	if not (usrData.currentWFile is None):
+		text+=(usrData.currentWFile+".model")
+	else:
+		text+=" aucun "
+	text+=" - TER 2020-2021 - Logique Intuitionniste - "
+	text+= activeFrame
+	window.title(text)
+
+
+	
+	
+	
 
 def createInter():
 	
@@ -105,6 +125,8 @@ def saveNInter():
 			usrData.save(ffileset=currentFile,wfileset=currentFile)
 			usrData.currentFFile=currentFile
 			usrData.currentWFile=currentFile
+			mainFrameName=window.title().rsplit('-',1)[1]
+			defTitle(mainFrameName)
 			close()
 		else:
 			t=Label(popup,text ="le nom ne peut pas être vide",fg="red")
@@ -132,6 +154,7 @@ def saveNFromula():
 	popup.grab_set()
 	popup.title("Choisiser un nom")
 	currentFile=""
+	
 
 	def close():
 		popup.grab_release()
@@ -142,6 +165,8 @@ def saveNFromula():
 		if currentFile !="":
 			usrData.save(ffileset=currentFile)
 			usrData.currentFFile=currentFile
+			mainFrameName=window.title().rsplit('-',1)[1]
+			defTitle(mainFrameName)
 			close()
 		else:
 			t=Label(popup,text ="le nom ne peut pas être vide",fg="red")
@@ -177,6 +202,8 @@ def saveNWorld():
 		if currentFile !="":
 			usrData.save(wfileset=currentFile)
 			usrData.currentWFile=currentFile
+			mainFrameName=window.title().rsplit('-',1)[1]
+			defTitle(mainFrameName)
 			close
 		else:
 			t=Label(popup,text ="le nom ne peut pas être vide",fg="red")
@@ -237,7 +264,7 @@ def destroyMainWindowSons() :
 def createMainFrame() :
 
 	
-	window.title("TER 2020-2021 - Logique Intuitionniste - Menu principal")
+	defTitle("Menu principal")
 
 	window.columnconfigure(0, weight = 1)
 	window.rowconfigure(0, weight = 1)
@@ -246,6 +273,7 @@ def createMainFrame() :
 	# DESTRUCTION DE L'ANCIENNE FENETRE
 
 	destroyMainWindowSons()
+	
 
 	
 	# CREATION DU CADRE DE LA FENETRE PRINCIPALE
@@ -280,16 +308,20 @@ def createToolbar() :
 	fichierMenu.add_command(label = 'Ouvrir une interprétation existante', command = openInter)
 	fichierMenu.add_command(label = 'Ouvrir une formule existante', command = openFormula)
 	fichierMenu.add_command(label = 'Ouvrir un modele existant', command = openWorld)
+	fichierMenu.add_separator()
 	fichierMenu.add_command(label = "Enregistrer l'interpétation", command = saveCInter) 
 	fichierMenu.add_command(label = "Enregistrer l'interprétation sous...", command = saveNInter)
+	fichierMenu.add_separator()
 	fichierMenu.add_command(label = "Enregistrer la formule", command = saveCFormula) 
 	fichierMenu.add_command(label = "Enregistrer la formule sous...", command = saveNFromula)
+	fichierMenu.add_separator()
 	fichierMenu.add_command(label = "Enregistrer le model", command = saveCWorld) 
 	fichierMenu.add_command(label = "Enregistrer le model sous...", command = saveNWorld)
 
 	# AJOUT DU MENU FICHIER A LA BARRE DE MENU
 
 	barreMenu.add_cascade(label = 'Fichier', menu = fichierMenu)
+
 
 
 def createFormulaFrame() :
@@ -344,7 +376,6 @@ def createFormulaFrame() :
 		else:
 			if replacerec(usrData.formula,selected,elem):
 				usrData.select=elem
-				print(usrData.formula)
 				return True
 			else:
 				return False
@@ -467,46 +498,47 @@ def createFormulaFrame() :
 		var = cl.Or(cl.Variable("undefined"), cl.Variable("undefined"))
 		succDecide(usrData.select, var)
 		replace(usrData.select, var)
-		viewer.deawTree(usrData.formula)
+		viewer.drawTree(usrData.formula)
 	
 	def createAnd():
 		var = cl.And(cl.Variable("undefined"), cl.Variable("undefined"))
 		succDecide(usrData.select, var)
 		replace(usrData.select, var)
-		viewer.deawTree(usrData.formula)
+		viewer.drawTree(usrData.formula)
 
 	def createImp():
 		var = cl.Imp(cl.Variable("undefined"), cl.Variable("undefined"))
 		succDecide(usrData.select, var)
 		replace(usrData.select, var)
-		viewer.deawTree(usrData.formula)
+		viewer.drawTree(usrData.formula)
 
 	def createNot():
 		var = cl.Not(cl.Variable("undefined"))
 		succDecide(usrData.select, var)
 		replace(usrData.select, var)
-		viewer.deawTree(usrData.formula)
+		viewer.drawTree(usrData.formula)
 
 	def createTop():
 		var = cl.Top()
 		replace(usrData.select, var)
-		viewer.deawTree(usrData.formula)
+		viewer.drawTree(usrData.formula)
 
 	def createBot():
 		var = cl.Bot()
 		replace(usrData.select, var)
-		viewer.deawTree(usrData.formula)
+		viewer.drawTree(usrData.formula)
 	
 	
 
 
 
-	window.title("TER 2020-2021 - Logique Intuitionniste - Éditeur de formule")
+	defTitle("Éditeur de formule")
 
 
 	# DESTRUCTION DE l'ANCIENNE FENETRE
 
 	destroyMainWindowSons()
+	
 
 
 	# VARIABLES DE CONTROLE
@@ -610,10 +642,10 @@ def createModelFrame() :
 
 	
 
-	class ModeleWrapper(TreeWrapper):
+	class ModelWrapper(TreeWrapper):
 		def children(self,node):
-			if len(self._sons)!=0:
-				return self._sons
+			if len(node._sons)!=0:
+				return node._sons
 			else:
 				return None
 
@@ -626,7 +658,7 @@ def createModelFrame() :
 		def onClick(self,node):
 			
 			usrData.select=node
-			viewer.drawTree(monde)
+			viewer.drawTree(usrData.model)
 
 		def bg(self, node):
 			if node==usrData.select:
@@ -645,18 +677,19 @@ def createModelFrame() :
 
 	#TODO addVariableToWorld
 
-
+	defTitle("Éditeur de Model")
 	# DESTRUCTION DE l'ANCIENNE FENETRE
 
 	destroyMainWindowSons()
 
 
-	# CREATION DU CADRE DE LA PAGE CREER FORMULE
+
+	# CREATION DU CADRE DE LA PAGE CREER MODEL
 
 	worldMainFrame = ttk.Frame(window, padding = (20, 2, 20, 0))
 
 
-	# CREATION DES ELEMENTS DU CADRE FORMULE
+	# CREATION DES ELEMENTS DU CADRE MODEL
 
 	worldTitleFrame = ttk.Label(worldMainFrame, text='Editeur De Mondes', style='Titre.TLabel')
 	graphFrame = ttk.Frame(worldMainFrame)
@@ -712,12 +745,12 @@ def createModelFrame() :
 
 	# PARTIE FONCTIONNELLE
 
-	listvar = getlistvar()
+	
 
 	
 
-	fwrap=WorldWrapper()	
-	viewer = TreeViewer(fwrap, graphFrame, world)
+	mwrap=ModelWrapper()	
+	viewer = TreeViewer(mwrap, graphFrame, usrData.model)
 
 
 
