@@ -1,1 +1,11 @@
-MêËÜº Š«ž"{nŠØ¨ž+-xžž÷§ºË«ž‹kzÊk¢7­-æîµ×œzšèë^µ×­®‹¯•«Ú•ë«véÞŠ{^®šÞµ«b¢w^•©h‚*®z)íº+b¢x¬µë­ŠX¬j{nžjzW^’¸©‘ç­qæ¥j'^uéZ¦™bq«b¢{"Šw%ºÇš~)ÝºØ¥ŠÇ«qëmyªi–'¶*'¾‹¬jêÚŠÆÞ²ˆ§uéZuêçŠ·¯z»"¢w^§+a¢}Ýº–œ‘¨¶H§µêé¢êéÊØhŸ{èºËk¢ëÞ­ìîž¢uçbžËZ•«b¢w§²è¯j{\zXžžm¦Ïÿ¶GhrÇ(›ûn¶Šâj_âžËZ–XmšWb±ÉZ™êÜzšèë\¢{bz{§z÷«²*'š‡b~'«vçârž®ÚÞzøžÂœ­®‹¯†Ûi³ÿëzÊ.­Ç¬¢·¢–\œ¢oÞÅ©©•ë?÷¿4çÞ´ÓO9ÕÖ§²W¢Ë"z¿{óN}ëM4óÓ]6Ó]wçÄÅ©©•ë?<ý„ü;-®ç-ý:ÞyXžÁ«Þrš.®g§²*'–¥9¢–\›¢‰,j·¡z·­¢¥§*.ër¢êã¡·hâ'éÞ­©r¢éšÊë¶œ¡×¢œä^ŠYrnŠ$²)ò¢êé®ˆ+jk×hréžžÖ­Š‰Ø¢çhž‹gyçm¡Ê'µ§-ºÇè®—«š+,Š‰îžW¬³*.­êÞ¦º¹È§«"‚xŸ‰Æ§¶š+¶*'¡ûayÊxZ+{¦¦W°®+bž©®ˆ+jkajÛ¬zË½êÚ•ÈnžK(}Êyúèš‹«nŠ$±Ú²z-­ê®Š·©z¹¢²È¨œ	ìÁêâžª¹ë-Š‰ÛÉÈ­Šx(º¶è¢KÚ®¢Ø§ìZš™^r‡^v‡¬ž‹kz«¢­ê^®h¬²*':{az‹az¸ZÛ–X§‚ŠÝŠËk‰»­Šx4N2‡ÞÅ©©•ë®‰ŽEè¥—&è¢K¡ë+z«¢­ê^®h¬²*'"w(®š+jØ§«"‚xŸ‰Æ§µ©¨º{h}ìZš™^r‡^~º&¢êÛ¢‰,Š{hÊ‹«¦º¹Ëlv‡.™éíjØ¨Ú²·ªº*Þ¥êæŠË"¢
+**Ter L3 Logique Intuitioniste**
+
+Bienvenu sur notres projet.
+Le but de ce projet et de trouvÃ© la valeur dune interpretation de la logique intuitioniste utilisant un model de kripke
+et ce a l'aide de l'application si incluse
+
+afin d'utiliser cette application vous aurais besoin:
+ - de la derniÃ¨re version de python3
+ - du package tkinter pour python3 (vous trouverez un guide d'instalation en suivant ce lien https://tkdocs.com/tutorial/install.html)
+
+
