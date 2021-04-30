@@ -35,7 +35,7 @@ def defTitle(activeFrame):
 
 def createInter():
 	
-	usrData.modele= cl.World("M:0,0")
+	usrData.modele= cl.World("M:0")
 	usrData.formula = cl.Variable('undefined')
 	usrData.select = usrData.formula
 	createFormulaFrame()
@@ -54,7 +54,7 @@ def openFormula():
 			usrData.select=usrData.formula
 
 			if usrData.model==None:
-				usrData.model=cl.World("M:0,0")
+				usrData.model=cl.World("M:0")
 			createFormulaFrame()
 
 def openWorld():
@@ -642,10 +642,10 @@ def createModelFrame() :
 
 	
 
-	class ModeleWrapper(TreeWrapper):
+	class ModelWrapper(TreeWrapper):
 		def children(self,node):
-			if len(self._sons)!=0:
-				return self._sons
+			if len(node._sons)!=0:
+				return node._sons
 			else:
 				return None
 
@@ -658,7 +658,7 @@ def createModelFrame() :
 		def onClick(self,node):
 			
 			usrData.select=node
-			viewer.drawTree(monde)
+			viewer.drawTree(usrData.model)
 
 		def bg(self, node):
 			if node==usrData.select:
@@ -721,12 +721,12 @@ def createModelFrame() :
 
 	# PARTIE FONCTIONNELLE
 
-	listvar = getlistvar()
+	
 
 	
 
-	fwrap=WorldWrapper()	
-	viewer = TreeViewer(fwrap, graphFrame, world)
+	mwrap=ModelWrapper()	
+	viewer = TreeViewer(mwrap, graphFrame, usrData.model)
 
 
 
