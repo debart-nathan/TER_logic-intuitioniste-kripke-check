@@ -694,8 +694,7 @@ def createModelFrame() :
 	def addVariableToWorld():
 
 		def valider ():
-			usrData.select._vars = [listvar[i] for i in frameCheck.curselection()]
-			print (usrData.select._vars)
+			usrData.select.vars = [listvar[i] for i in frameCheck.curselection()]
 
 		frameCheck = Listbox(variableFrame, selectmode = MULTIPLE, yscrollcommand = True)
 		frameCheck.grid(column = 0, row = 1, sticky = (N, S, E, W))
