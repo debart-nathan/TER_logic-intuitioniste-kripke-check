@@ -15,7 +15,7 @@ usrData=Userdata()
 
 def createInter():
 	
-	usrData.modele= cl.World("M:0,0")
+	usrData.modele= cl.World("M:0")
 	usrData.formula = cl.Variable('undefined')
 	usrData.select = usrData.formula
 	createFormulaFrame()
@@ -34,7 +34,7 @@ def openFormula():
 			usrData.select=usrData.formula
 
 			if usrData.model==None:
-				usrData.model=cl.World("M:0,0")
+				usrData.model=cl.World("M:0")
 			createFormulaFrame()
 
 def openWorld():
@@ -633,6 +633,17 @@ def createModelFrame() :
 				return 'yellow2'
 			return 'gray77'
 
+	def addSon():
+		newSonName = usrData.select.name + '-'+len(usrData.select._sons)
+		usrData.select.sons(newSonName)
+		viewer.drawTree(usrData.World)
+
+
+	#TODO removeSelf():
+	#def removeSelf():
+	#	index = 
+
+	#TODO addVariableToWorld
 
 
 	# DESTRUCTION DE l'ANCIENNE FENETRE
@@ -651,8 +662,18 @@ def createModelFrame() :
 	graphFrame = ttk.Frame(worldMainFrame)
 	toolBox = ttk.Notebook(worldMainFrame)
 	toolsFrame = ttk.Frame(toolBox)
+
+	Bouton_AjoutFils = ttk.Button(toolsFrame, text = "Add son", command = addSon)
+	Bouton_RetraitSelf = ttk.Button(toolsFrame, text = "Remove", command = removeSelf)
+	Bouton_Var = ttk.Button(toolsFrame, text = "Add Variable", command = addVariableToWorld)
+
 	variableFrame = ttk.Frame(toolBox)
-	varnameEntry = ttk.Entry(variableFrame)
+
+
+
+
+
+
 	
 
 
@@ -677,6 +698,9 @@ def createModelFrame() :
 	toolBox.add(toolsFrame, text = 'Outils')
 	toolBox.add(variableFrame, text = 'Variables')
 
+	Bouton_AjoutFils.grid(column = 0, row = 0, sticky = (N, S, E, W))
+	Bouton_RetraitSelf.grid(column = 0, row = 1, sticky = (N, S, E, W))
+	Bouton_Var.grid(column = 0, row = 2, sticky = (N, S, E, W))
 	
 
 
