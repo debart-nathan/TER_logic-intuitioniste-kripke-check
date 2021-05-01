@@ -130,13 +130,13 @@ def saveNInter():
 			close()
 		else:
 			t=Label(popup,text ="le nom ne peut pas être vide",fg="red")
-			t.grid(column=0,row=1)
+			t.grid(column=0,row=1,columnspan=2)
 	
 	b1=Button(popup,text="save",command= save)
 	b2=Button(popup,text="cancel",command=close)
 	entry= ttk.Entry(popup, textvariable = currentFile)
 	
-	entry.grid(column=0, row = 0, sticky = (N, S, E, W))
+	entry.grid(column=0, row = 0,columnspan=2, sticky = (N, S, E, W))
 	b1.grid(column=0, row = 2, sticky = (N, S, E, W))
 	b2.grid(column=1, row = 2, sticky = (N, S, E, W))
 	
@@ -170,13 +170,13 @@ def saveNFromula():
 			close()
 		else:
 			t=Label(popup,text ="le nom ne peut pas être vide",fg="red")
-			t.grid(column=0,row=1)
+			t.grid(column=0,row=1,columnspan=2)
 	
 	b1=Button(popup,text="save",command= save)
 	b2=Button(popup,text="cancel",command=close)
 	entry= ttk.Entry(popup, textvariable = currentFile)
 	
-	entry.grid(column=0, row = 0, sticky = (N, S, E, W))
+	entry.grid(column=0, row = 0,columnspan=2, sticky = (N, S, E, W))
 	b1.grid(column=0, row = 2, sticky = (N, S, E, W))
 	b2.grid(column=1, row = 2, sticky = (N, S, E, W))
 
@@ -207,13 +207,13 @@ def saveNWorld():
 			close
 		else:
 			t=Label(popup,text ="le nom ne peut pas être vide",fg="red")
-			t.grid(column=0,row=1)
+			t.grid(column=0,row=1,columnspan=2)
 	
 	b1=Button(popup,text="save",command= save)
 	b2=Button(popup,text="cancel",command=close)
 	entry= ttk.Entry(popup, textvariable = currentFile)
 	
-	entry.grid(column=0, row = 0, sticky = (N, S, E, W))
+	entry.grid(column=0, row = 0,columnspan=2, sticky = (N, S, E, W))
 	b1.grid(column=0, row = 2, sticky = (N, S, E, W))
 	b2.grid(column=1, row = 2, sticky = (N, S, E, W))
 
@@ -712,7 +712,9 @@ def createModelFrame() :
 			usrData.select._vars=[]
 			usrData.select.vars = [listvar[i] for i in frameCheck.curselection()]
 			variableWorld()
-		variable.config(text=usrData.select._vars)
+
+		variableT.config(text=usrData.select.name+' : \n'+ str(usrData.select._vars))
+		variableV.config(text=usrData.select.name+' : \n'+ str(usrData.select._vars))
 		
 		frameCheck = Listbox(variableFrame, selectmode = MULTIPLE, yscrollcommand = True)
 		
@@ -757,19 +759,16 @@ def createModelFrame() :
 	toolBox = ttk.Notebook(worldMainFrame)
 	toolsFrame = ttk.Frame(toolBox)
 
+	variableT=Label(toolsFrame, justify=LEFT)
 	Bouton_AjoutFils = ttk.Button(toolsFrame, text = "Add son", command = addSon)
 	Bouton_RetraitSelf = ttk.Button(toolsFrame, text = "Remove", command = removeSelf)
 
 	variableFrame = ttk.Frame(toolBox)
-	variable=Label(variableFrame)
+	
+	variableV=Label(variableFrame, justify=LEFT)
 
 	
 
-
-
-
-
-	
 
 
 	# CREATION DES FRAMES DE REMPLISSAGE DES VIDES
@@ -793,10 +792,11 @@ def createModelFrame() :
 	toolBox.add(toolsFrame, text = 'Outils')
 	toolBox.add(variableFrame, text = 'Variables')
 
-	Bouton_AjoutFils.grid(column = 0, row = 0, sticky = (N, S, E, W))
-	Bouton_RetraitSelf.grid(column = 0, row = 1, sticky = (N, S, E, W))
+	Bouton_AjoutFils.grid(column = 0, row = 1, sticky = (N, S, E, W))
+	Bouton_RetraitSelf.grid(column = 0, row = 2, sticky = (N, S, E, W))
 	
-	variable.grid(column=0,row=0,sticky=SW)
+	variableT.grid(column=0,row=0,columnspan=2,sticky=NSEW)
+	variableV.grid(column=0,row=0,columnspan=2,sticky=NSEW)
 
 	# CONFIGURATION DES ELEMENTS DE LA GRILLE (changement de la taille de la fenêtre)
 
