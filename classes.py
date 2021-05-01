@@ -119,11 +119,15 @@ class Top(Atom):
 	def __init__(self):
 		super(Top, self).__init__()
 		self.value = True
+	def __repr__(self):
+		return "TOP"
 		
 class Bot(Atom):
 	def __init__(self):
 		super(Bot, self).__init__()
 		self.value = False
+	def __repr__(self):
+		return "BOT"
 
 ### représentation des mondes	
 		
