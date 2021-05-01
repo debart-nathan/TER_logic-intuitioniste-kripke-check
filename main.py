@@ -72,12 +72,12 @@ def openWorld():
 			if usrData.formula==None:
 				usrData.formula=cl.Variable("undefined")
 
-	#		if bienConstruite():
-			usrData.select=usrData.model
-			createModelFrame()
-	#		else:
-	#			usrData.select=usrData.formula
-	#			createFormulaFrame()
+			if bienConstruite():
+				usrData.select=usrData.model
+				createModelFrame()
+			else:
+				usrData.select=usrData.formula
+				createFormulaFrame()
 	
 
 def openInter():
