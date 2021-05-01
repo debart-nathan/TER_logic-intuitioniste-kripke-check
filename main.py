@@ -229,14 +229,20 @@ def getlistvarrec(current):
 	
 	if isinstance(current, cl.Variable):
 		if current.name!='undefined':
-			listvar.append(current.name)
+			
+			listvar.append(current)
 	
 	elif not isinstance(current, (cl.Top, cl.Bot)) :
 		for succ in current.succ:
 			varsuc=getlistvarrec(succ)
 			for var in varsuc:
-				if not (var  in listvar):
+				a=True
+				for var2 in listvar:
+					if var2.name == var.name:
+						a=False	
+				if a:
 					listvar.append(var)
+	
 	return listvar
 
 
@@ -245,12 +251,16 @@ def getListVarForm():
 	
 	if isinstance(usrData.formula, cl.Variable):
 		if usrData.formula.name!='undefined':
-			listvar.append(usrData.formula.name)
+			listvar.append(usrData.formula)
 	elif not isinstance(usrData.formula, (cl.Top,cl.Bot)):
 		for succ in usrData.formula.succ:
 			varsuc=getlistvarrec(succ)
 			for var in varsuc:
-				if not (var  in listvar):
+				a=True
+				for var2 in listvar:
+					if var2.name == var.name:
+						a=False	
+				if a:
 					listvar.append(var)
 	return listvar
 
@@ -444,22 +454,25 @@ def createFormulaFrame() :
 
 	def changeEntryTextFromListbox(*args):
 		if len(variableListbox.curselection()) > 0 :
-			entryText = listVar[int(variableListbox.curselection()[0])]
+			entryText = listVar[int(variableListbox.curselection()[0])].name
 			entryTextVar.set(entryText)
 
 
 	def createVar(*args):
+		
 		if varnameEntry.get()!='':
 			if varnameEntry.get()!= 'undefined':
 				var = cl.Variable(varnameEntry.get().lower())
 				if replace(usrData.select,var):
 
 					viewer.drawTree(usrData.formula)
-
-					if var.name in listVar:
-						listVar.remove(var.name)
-					listVar.insert(0,var.name)
-					listVarVar.set(listVar)
+					temp=[]
+					for i in range(len(listVar)):
+						if listVar[i].name == var.name:
+							listVar.pop(i)
+					
+					listVar.insert(0,var)
+					listVarVar.set([var.name for var in listVar])
 
 					variableListbox.select_clear(0,"end")
 					variableListbox.select_set(0)
@@ -473,13 +486,13 @@ def createFormulaFrame() :
 				return messagebox.showinfo('message',f"undefined n'est pas un nom de variable valide")
 		elif  len(variableListbox.curselection())==1:
 
-			var=cl.Variable(listVar[variableListbox.curselection()[0]])
+			var=cl.Variable(listVar[variableListbox.curselection()[0].name])
 			if replace(usrData.select,var):
 				viewer.drawTree(usrData.formula)
 
-				listVar.remove(var.name)
-				listVar.insert(0,var.name)
-				listVarVar.set(listVar)
+				listVar.remove(var)
+				listVar.insert(0,var)
+				listVarVar.set([var.name for var in listVar])
 
 				variableListbox.select_clear(0,"end")
 				variableListbox.select_set(0)
@@ -545,7 +558,7 @@ def createFormulaFrame() :
 
 	listVar = getListVarForm()
 	
-	listVarVar = StringVar(value = listVar)
+	listVarVar = StringVar(value = [var.name for var in listVar])
 
 	entryText = ""
 	entryTextVar = StringVar(value = entryText)
@@ -659,6 +672,7 @@ def createModelFrame() :
 			
 			usrData.select=node
 			viewer.drawTree(usrData.model)
+			variableWorld()
 
 		def bg(self, node):
 			if node==usrData.select:
@@ -669,6 +683,7 @@ def createModelFrame() :
 		newSonName = usrData.select.name + '-'+str(len(usrData.select._sons))
 		usrData.select.sons = newSonName
 		viewer.drawTree(usrData.model)
+		variableWorld()
 
 
 	
@@ -690,19 +705,28 @@ def createModelFrame() :
 		else :
 			messagebox.showinfo("",f"Vous ne pouvez pas supprimer le monde racine")
 
-	#TODO addVariableToWorld
-	def addVariableToWorld():
+
+	def variableWorld():
 
 		def valider ():
+			usrData.select._vars=[]
 			usrData.select.vars = [listvar[i] for i in frameCheck.curselection()]
-
+			variableWorld()
+		variable.config(text=usrData.select._vars)
+		
 		frameCheck = Listbox(variableFrame, selectmode = MULTIPLE, yscrollcommand = True)
+		
 		frameCheck.grid(column = 0, row = 1, sticky = (N, S, E, W))
+
 		listvar = getListVarForm()
+		
 		for i in range(len(listvar)) :
-			frameCheck.insert(i,listvar[i])
-			if listvar[i] in usrData.select._vars :
-				frameCheck.selection_set(i)
+			
+			frameCheck.insert(i,listvar[i].name)
+		
+			for vars in usrData.select._vars :
+				if listvar[i].name == vars.name:
+					frameCheck.selection_set(i)
 		variablesbutton = ttk.Button(variableFrame, text = "Valider", command = valider)
 		variablesbutton.grid(column = 0, row = 2 , sticky = (N, S, E, W))
 
@@ -737,8 +761,9 @@ def createModelFrame() :
 	Bouton_RetraitSelf = ttk.Button(toolsFrame, text = "Remove", command = removeSelf)
 
 	variableFrame = ttk.Frame(toolBox)
+	variable=Label(variableFrame)
 
-	Bouton_Var = ttk.Button(variableFrame, text = "Add Variable", command = addVariableToWorld)
+	
 
 
 
@@ -770,9 +795,8 @@ def createModelFrame() :
 
 	Bouton_AjoutFils.grid(column = 0, row = 0, sticky = (N, S, E, W))
 	Bouton_RetraitSelf.grid(column = 0, row = 1, sticky = (N, S, E, W))
-	Bouton_Var.grid(column = 0, row = 0, sticky = (N, S, E, W))
 	
-
+	variable.grid(column=0,row=0,sticky=SW)
 
 	# CONFIGURATION DES ELEMENTS DE LA GRILLE (changement de la taille de la fenêtre)
 
@@ -782,12 +806,10 @@ def createModelFrame() :
 
 	# PARTIE FONCTIONNELLE
 
-	
-
-	
 
 	mwrap=ModelWrapper()	
 	viewer = TreeViewer(mwrap, graphFrame, usrData.model)
+	variableWorld()
 
 
 
@@ -804,6 +826,7 @@ window.minsize(720, 360)
 createToolbar()
 
 createMainFrame()
+
 
 
 ###############################################
