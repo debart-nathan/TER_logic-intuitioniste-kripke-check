@@ -459,18 +459,15 @@ def createFormulaFrame() :
 						conserver1L.grid(row=1,column=0,sticky=(N, S, E, W))
 						conserver1R.grid(row=1,column=1,sticky=(N, S, E, W))
 						conserver2L.grid(row=1,column=2,sticky=(N, S, E, W))
-						conserver2R.grid(row=1,column=3,sticky=(N, S, E, W))
-						cons.grid(row=1,column=4,sticky=(N, S, E, W))
-						conserverRev.grid(row=1,column=5,sticky=(N, S, E, W))
+						conserver2R.grid(row=2,column=0,sticky=(N, S, E, W))
+						cons.grid(row=2,column=1,sticky=(N, S, E, W))
+						conserverRev.grid(row=2,column=2,sticky=(N, S, E, W))
 
-						label.grid(column = 0, row = 0, columnspan = 6, sticky=(N, E, W))
-						rien.grid(column=0, row=3, columnspan = 6, sticky=(N, S, E, W))
+						label.grid(column = 0, row = 0, columnspan = 3, sticky=(N, E, W))
+						rien.grid(column=0, row=3, columnspan = 3, sticky=(N, S, E, W))
 						popupFrame.columnconfigure(1, weight = 1)
 						popupFrame.columnconfigure(2, weight = 1)
-						popupFrame.columnconfigure(3, weight = 1)
-						popupFrame.columnconfigure(4, weight = 1)
-						popupFrame.columnconfigure(5, weight = 1)
-
+						
                         
                     
 
@@ -478,7 +475,10 @@ def createFormulaFrame() :
 				popupFrame.rowconfigure(0, weight = 1)
 
 				popup.columnconfigure(0, weight = 1)
-				popup.rowconfigure(0, weight = 1)		
+				popup.rowconfigure(0, weight = 1)
+				popup.title("Que faire des fils présents ?")
+				return True
+		return False
 
 	def changeEntryTextFromListbox(*args):
 		if len(variableListbox.curselection()) > 0 :
@@ -537,27 +537,36 @@ def createFormulaFrame() :
 
 	def createOr():
 		var = cl.Or(cl.Variable("undefined"), cl.Variable("undefined"))
-		succDecide(usrData.select, var)
-		replace(usrData.select, var)
-		viewer.drawTree(usrData.formula)
+		if succDecide(usrData.select, var):
+			replace(usrData.select, var)
+		else:
+			replace(usrData.select, var)
+			viewer.drawTree(usrData.formula)
+			
 	
 	def createAnd():
 		var = cl.And(cl.Variable("undefined"), cl.Variable("undefined"))
-		succDecide(usrData.select, var)
-		replace(usrData.select, var)
-		viewer.drawTree(usrData.formula)
+		if succDecide(usrData.select, var):
+			replace(usrData.select, var)
+		else:
+			replace(usrData.select, var)
+			viewer.drawTree(usrData.formula)
 
 	def createImp():
 		var = cl.Imp(cl.Variable("undefined"), cl.Variable("undefined"))
-		succDecide(usrData.select, var)
-		replace(usrData.select, var)
-		viewer.drawTree(usrData.formula)
+		if succDecide(usrData.select, var):
+			replace(usrData.select, var)
+		else:
+			replace(usrData.select, var)
+			viewer.drawTree(usrData.formula)
 
 	def createNot():
 		var = cl.Not(cl.Variable("undefined"))
-		succDecide(usrData.select, var)
-		replace(usrData.select, var)
-		viewer.drawTree(usrData.formula)
+		if succDecide(usrData.select, var):
+			replace(usrData.select, var)
+		else:
+			replace(usrData.select, var)
+			viewer.drawTree(usrData.formula)
 
 	def createTop():
 		var = cl.Top()
