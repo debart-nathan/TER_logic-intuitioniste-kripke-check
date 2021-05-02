@@ -12,6 +12,8 @@ import os
 usrData=Userdata()
 
 def defTitle(activeFrame):
+	"""Détermine le titre de la Fenêtre principale 
+	avec activeFrame une String nous donnant notres position dans l'interface"""
 
 	text= "formule : "
 	if not (usrData.currentFFile is None):
@@ -34,6 +36,7 @@ def defTitle(activeFrame):
 	
 
 def createInter():
+	"""initialise une interprétation vide et lance l'interFace de modificationd des Formules"""
 	
 	usrData.modele= cl.World("M:0")
 	usrData.formula = cl.Variable('undefined')
@@ -41,6 +44,9 @@ def createInter():
 	createFormulaFrame()
 
 def openFormula():
+	"""Ouvre une formule près enregistrer a l'aide d'un navigateur de fichier et lance l'éditeur de formule
+	seuls des fichier présent dans 'assets/userdata' peutvent êtres chargé"""
+
 	currentFile=filedialog.askopenfilename(initialdir="./assets/userdata/" ,filetypes=[("formula file","*.formula")])
 	if currentFile!= ():
 		currentFile=os.path.split(currentFile)
@@ -58,6 +64,9 @@ def openFormula():
 			createFormulaFrame()
 
 def openWorld():
+	"""Ouvre un Model près enregistrer a l'aide d'un navigateur de fichier et lance l'éditeur de Model si la formule est bien construite(sinon lance l'éditeur de formule)
+	seuls des fichier présent dans 'assets/userdata' peutvent êtres chargé"""
+
 	currentFile= filedialog.askopenfilename(initialdir="./assets/userdata/" ,filetypes=[("model file","*.model")])
 	if currentFile!= ():
 		currentFile=os.path.split(currentFile)
@@ -72,15 +81,18 @@ def openWorld():
 			if usrData.formula==None:
 				usrData.formula=cl.Variable("undefined")
 
-			if bienConstruite():
-				usrData.select=usrData.model
-				createModelFrame()
-			else:
-				usrData.select=usrData.formula
-				createFormulaFrame()
+			#if bienConstruite():
+			usrData.select=usrData.model
+			createModelFrame()
+			#else:
+			#	usrData.select=usrData.formula
+			#	createFormulaFrame()
 	
 
 def openInter():
+	"""ouvre successivement une Formule et un Model prés enregistré puis lance l'interface d'édition de Formule
+	seuls des fichier présent dans 'assets/userdata' peutvent êtres chargé"""
+
 	currentFile= filedialog.askopenfilename(initialdir="./assets/userdata/" ,filetypes=[("formula file","*.formula")])
 	currentFile2= filedialog.askopenfilename(initialdir="./assets/userdata/" ,filetypes=[("model file","*.model")])
 	if currentFile!= () or currentFile2!= ():
@@ -104,22 +116,26 @@ def openInter():
 
 
 def	saveCInter():
+	"""sauvegade le dernier fichier de Monde et de Formule ouvert dans l'instance"""
 	if usrData.currentFFile ==None or usrData.currentWFile ==None:
 		messagebox.showinfo('Alert',f'Au moins un des fichers (formule/model) n\'est pas ouvert')
 	else:
 		usrData.save(ffileset=usrData.currentFFile,wfilset=usrData.currentWFile)
 
 def saveNInter():
+	"""enregistre la Formule et le Model courant dans 'assets/userdata' sous un nom choisi par l'utilisateur """
 	popup=Toplevel()
 	popup.grab_set()
 	popup.title("Choisiser un nom")
 	currentFile=""
 
 	def close():
+		""" anule la sauvegarde"""
 		popup.grab_release()
 		popup.destroy()
 		popup.update()
 	def save():
+		"""sauvegarde avec le nom choisis"""
 		currentFile=entry.get()
 		if currentFile !="":
 			usrData.save(ffileset=currentFile,wfileset=currentFile)
@@ -144,12 +160,14 @@ def saveNInter():
 
 
 def	saveCFormula():
+	"""Enregistre la Formule courrante dans le dernier Fichier Formule ouvert de l'instance"""
 	if usrData.currentFFile ==None :
 		messagebox.showinfo('Alert',f'Aucune fichier formule ouvert')
 	else:
 		usrData.save(ffileset=usrData.currentFFile)
 
 def saveNFromula():
+	"""enregistre la Formule courante dans 'assets/userdata' sous un nom choisi par l'utilisateur """
 	popup=Toplevel()
 	popup.grab_set()
 	popup.title("Choisiser un nom")
@@ -182,12 +200,14 @@ def saveNFromula():
 
 
 def	saveCWorld():
+	"""Enregistre le Model courrant dans le dernier Fichier Model ouvert de l'instance"""
 	if  usrData.currentWFile ==None:
 		messagebox.showinfo('Alert',f'Aucun fichier model ouvert')
 	else:
 		usrData.save(wfilset=usrData.currentWFile)
 
 def saveNWorld():
+	"""enregistre le Model courant dans 'assets/userdata' sous un nom choisi par l'utilisateur """
 	popup=Toplevel()
 	popup.grab_set()
 	popup.title("Choisiser un nom")
@@ -225,6 +245,10 @@ def saveNWorld():
 
 
 def getlistvarrec(current):
+	"""vérifie si current est une variable défini et si oui l'ajoute au tuple,
+	puis relance la fonction sur les successeurs de current et concatene les résutat dans le retour
+
+	renvoi Tuple de Variable sans répétition sur les nom"""
 	listvar=[]
 	
 	if isinstance(current, cl.Variable):
@@ -247,6 +271,8 @@ def getlistvarrec(current):
 
 
 def getListVarForm():
+	"""vérifie que la racine est une variable si oui on l'envoi dan un Tuple sinon on renvoi le résultat de la version récursive
+	renvoi un Tuple de Variable sans répétition sur les nom"""
 	listvar=[]
 	
 	if isinstance(usrData.formula, cl.Variable):
@@ -266,12 +292,14 @@ def getListVarForm():
 
 
 def destroyMainWindowSons() :
+	"""nétoi l'interface de ces éllément"""
 	for enfant in window.winfo_children():
 		if isinstance(enfant, ttk.Frame):
 			enfant.destroy()
 
 
 def createMainFrame() :
+	"""génère la page d'accueil de l'application"""
 
 	
 	defTitle("Menu principal")
@@ -305,7 +333,7 @@ def createMainFrame() :
 
 
 def createToolbar() :
-	  
+	"""génère le menu déroulant de l'application utilisée pour sauvegarder/charger/créer des Fichier"""	  
   # BARRE DE MENU
 
 	barreMenu = Menu(window)
@@ -769,7 +797,10 @@ def createModelFrame() :
 		variablesbutton = ttk.Button(variableFrame, text = "Valider", command = valider)
 		variablesbutton.grid(column = 0, row = 2 , sticky = (N, S, E, W))
 
-
+	def validate(*args) :
+		if valids(usrData.formula,usrData.model):
+			return messagebox.showinfo('message',f"La formule est valide pour le modèle sélectionné")
+		return messagebox.showinfo('message',f"La formule n'est pas valide pour le modèle sélectionné")
 
 
 
@@ -804,6 +835,10 @@ def createModelFrame() :
 	
 	variableV=Label(variableFrame, justify=LEFT)
 
+
+	validatebutton = ttk.Button(worldMainFrame, text='Valider', command = validate)
+	backbutton = ttk.Button(worldMainFrame, text="Revenir à la formule", command = createFormulaFrame)
+
 	
 
 
@@ -834,6 +869,9 @@ def createModelFrame() :
 	
 	variableT.grid(column=0,row=0,columnspan=2,sticky=NSEW)
 	variableV.grid(column=0,row=0,columnspan=2,sticky=NSEW)
+
+	validatebutton.grid(column = 1, row = 3, sticky = (N, S, E, W))
+	backbutton.grid(column = 1, row = 2, sticky= (N, S, E, W))
 
 	# CONFIGURATION DES ELEMENTS DE LA GRILLE (changement de la taille de la fenêtre)
 
