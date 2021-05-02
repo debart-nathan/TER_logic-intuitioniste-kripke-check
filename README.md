@@ -1,8 +1,8 @@
 **Ter L3 Logique Intuitioniste**
 
 Bienvenu sur notres projet.
-Le but de ce projet et de trouvé la valeur dune interpretation de la logique intuitioniste utilisant un model de kripke
-et ce a l'aide de l'application si incluse
+Le but de ce projet est de créer une aplication d'on la fonction est de trouvé la valeur dune interpretation de la logique intuitioniste utilisant un model de kripke
+
 
 Afin d'utiliser cette application vous aurais besoin:
  - de la dernière version de python3
