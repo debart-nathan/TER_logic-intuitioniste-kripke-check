@@ -378,7 +378,6 @@ def createFormulaFrame() :
 
 
 	def replace(selected,elem):
-	
 		if usrData.formula==selected:
 			usrData.formula=elem
 			usrData.select=elem
@@ -391,66 +390,95 @@ def createFormulaFrame() :
 				return False
 	
 
+	
 	def succDecide(select,newnode):
-		if not (isinstance(select,(cl.Top,cl.Bot,cl.Variable)) or isinstance(newnode,(cl.Top,cl.Bot,cl.Variable))):
+		if not isinstance(select,(cl.Top,cl.Bot,cl.Variable)) or isinstance(newnode,(cl.Top,cl.Bot,cl.Variable)):
+			
 			index=[ x for x in range(len(select.succ)) if select.succ[x].name!= "undefined"]
-            	
+                
 			if len(index)!=0:
 				popup=Toplevel()
 				popup.minsize(300,200)
-				popup.maxsize(300,200)
+                # popup.maxsize(300,200)
 				popup.grab_set()
+
+				popupFrame = ttk.Frame(popup, padding = (20, 2, 20, 10))
+				popupFrame.grid(column = 0, row = 0, sticky = (N, S, E, W))
 				def conserver(indexold,indexnew):
 					for x in range(len(indexold)):
 						newnode.succ[indexnew[x]]=select.succ[indexold[x]]
+					viewer.drawTree(usrData.formula)
 					popup.grab_release()
 					popup.destroy()
 					popup.update()
 
-				label = Label(popup,text="{select.name} a déjà "+len(index)+" fils assigné voulez vous en conservé pour nouveau {newnode.name}")
-				label.grid(column=0,row=0, sticky=NSEW)
+				label = ttk.Label(popupFrame,text = select.name + " a déjà "+ ("un" if len(index)==1 else "deux") +" fils "+ ("assigné" if len(index)==1 else "assignés") +" voulez vous en conserver pour "+ newnode.name +" ?", style = "Conserver.TLabel")
+
+				rien = ttk.Button(popupFrame,text="Ne rien conserver",command = lambda : conserver([], []), style = 'Conserver.TButton')
 				if isinstance(newnode,cl.Not):
 					if len(index)==1:
-						conserver=Button(popup,text="Conserver le fils",command= conserver([index[0]],[0]))
+						cons=ttk.Button(popupFrame,text="Conserver le fils",command = lambda : conserver([index[0]], [0]), style = 'Conserver.TButton')
 
-						conserver.grid(row=2,column=0,sticky=NS)
-						
-						
+						cons.grid(row=1,column=0,sticky=(N, S, E, W))
+
+						label.grid(column = 0, row = 0, sticky=(N, E, W))
+						rien.grid(column=0, row=3, sticky=(N, S, E, W))                        
+
+   
 					elif len(index)==2:
-						conserver1=Button(popup,text="Conserver le fils gauche",command= conserver([index[0]],[0]))
-						conserver2=Button(popup,text="Conserver le fils droit",command= conserver([index[1]],[0]))
+						conserver1=ttk.Button(popupFrame,text="Conserver le fils gauche", command = lambda: conserver([index[0]], [0]), style = 'Conserver.TButton')
+						conserver2=ttk.Button(popupFrame,text="Conserver le fils droit", command = lambda: conserver([index[1]], [0]), style = 'Conserver.TButton')
 
-						conserver1.grid(row=2,column=0,sticky=NS)
-						conserver2.grid(row=2,column=1,sticky=NS)
+						conserver1.grid(row=1,column=0, sticky=(N, S, E, W))
+						conserver2.grid(row=1,column=1, sticky=(N, S, E, W))
+
+						label.grid(column = 0, row = 0, columnspan = 2, sticky=(N, E, W))
+						rien.grid(column=0, row=3, columnspan = 2, sticky=(N, S, E, W))
+
+						popupFrame.columnconfigure(1, weight = 1)
 				else:
 					if len(index)==1:
-						conserverL=Button(popup,text="Conserver le fils et le placer a gauche",command= conserver([index[0]],[0]))
-						conserverR=Button(popup,text="Conserver le fils et le placer a droite",command= conserver([index[0]],[1]))
+						conserverL=ttk.Button(popupFrame,text="Conserver le fils et le placer a gauche", command = lambda : conserver([index[0]], [0]), style = 'Conserver.TButton')
+						conserverR=ttk.Button(popupFrame,text="Conserver le fils et le placer a droite", command = lambda : conserver([index[0]], [1]), style = 'Conserver.TButton')
 
-						conserverL.grid(row=2,column=0,sticky=NS)
-						conserverR.grid(row=2,column=1,sticky=NS)
-		
-					
+						conserverL.grid(row=1,column=0,sticky=(N, S, E, W))
+						conserverR.grid(row=1,column=1,sticky=(N, S, E, W))
+
+						label.grid(column = 0, row = 0, columnspan = 2, sticky=(N, E, W))
+						rien.grid(column=0, row=3, columnspan = 2, sticky=(N, S, E, W))
+                        
+						popupFrame.columnconfigure(1, weight = 1)
 					elif len(index)==2:
-						conserver1L=Button(popup,text="Conserver le fils gauche et le placer a gauche",command= conserver([index[0]],[0]))
-						conserver1R=Button(popup,text="Conserver le fils gauche et le placer a droite",command= conserver([index[0]],[1]))
-						conserver2L=Button(popup,text="Conserver le fils droit et le placer a gauche",command= conserver([index[1]],[0]))
-						conserver2R=Button(popup,text="Conserver le fils droit et le placer a droite",command= conserver([index[1]],[1]))
-						conserver=Button(popup,text="Conserver les deux",command= conserver(index,[0,1]))
-						conserverRev=Button(popup,text="Conserver les deux mais inversé leurs position",command= conserver(index,[1,0]))
+						conserver1L=ttk.Button(popupFrame,text="Conserver le fils gauche et le placer a gauche", command= lambda : conserver([index[0]], [0]), style = 'Conserver.TButton')
+						conserver1R=ttk.Button(popupFrame,text="Conserver le fils gauche et le placer a droite", command= lambda : conserver([index[0]], [1]), style = 'Conserver.TButton')
+						conserver2L=ttk.Button(popupFrame,text="Conserver le fils droit et le placer a gauche", command= lambda : conserver([index[1]], [0]), style = 'Conserver.TButton')
+						conserver2R=ttk.Button(popupFrame,text="Conserver le fils droit et le placer a droite", command= lambda : conserver([index[1]], [1]), style = 'Conserver.TButton')
+						cons=ttk.Button(popupFrame,text="Conserver les deux", command= lambda : conserver(index, [0,1]), style = 'Conserver.TButton')
+						conserverRev=ttk.Button(popupFrame,text="Conserver les deux mais inverser leurs position", command= lambda : conserver(index, [1,0]), style = 'Conserver.TButton')
 
-						conserver1L.grid(row=2,column=0,sticky=NS)
-						conserver1R.grid(row=2,column=1,sticky=NS)
-						conserver2L.grid(row=2,column=2,sticky=NS)
-						conserver2R.grid(row=2,column=3,sticky=NS)
-						conserver.grid(row=2,column=4,sticky=NS)
-						conserverRev.grid(row=2,column=5,sticky=NS)
+						conserver1L.grid(row=1,column=0,sticky=(N, S, E, W))
+						conserver1R.grid(row=1,column=1,sticky=(N, S, E, W))
+						conserver2L.grid(row=1,column=2,sticky=(N, S, E, W))
+						conserver2R.grid(row=1,column=3,sticky=(N, S, E, W))
+						cons.grid(row=1,column=4,sticky=(N, S, E, W))
+						conserverRev.grid(row=1,column=5,sticky=(N, S, E, W))
 
-						
-					
-				rien=Button(popup,text="Ne rien conserver",command= conserver([],[]))
-				rien.grid(column=0,row=3,sticky=NS)
-						
+						label.grid(column = 0, row = 0, columnspan = 6, sticky=(N, E, W))
+						rien.grid(column=0, row=3, columnspan = 6, sticky=(N, S, E, W))
+						popupFrame.columnconfigure(1, weight = 1)
+						popupFrame.columnconfigure(2, weight = 1)
+						popupFrame.columnconfigure(3, weight = 1)
+						popupFrame.columnconfigure(4, weight = 1)
+						popupFrame.columnconfigure(5, weight = 1)
+
+                        
+                    
+
+				popupFrame.columnconfigure(0, weight = 1)
+				popupFrame.rowconfigure(0, weight = 1)
+
+				popup.columnconfigure(0, weight = 1)
+				popup.rowconfigure(0, weight = 1)		
 
 	def changeEntryTextFromListbox(*args):
 		if len(variableListbox.curselection()) > 0 :
