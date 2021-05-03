@@ -416,7 +416,7 @@ def createFormulaFrame() :
 
 
 	def replace(selected,elem):
-		"""partie non récursive de replace qui regarde si l'élément sélectonner par un nouvel elelment 
+		""" remplace l'élément sélectonner par un nouvel elelment 
 		dans le tuple des succ de ses pêre en conservant la position
 		renvoi False si selected n'a pas était trouvé"""
 
@@ -426,9 +426,7 @@ def createFormulaFrame() :
 			return True
 		else:
 			def replacerec(father,selected,elem):
-				"""partie récursive de replace qui permet de remplacer un objet(selected) par un autre(elem) 
-				en le remplacent dans le tuple des successeurs de ces père tout en gardant la même position dans ce tuple
-				renvoi False si selected n'a pas était trouvé"""
+				"""partie récursive de replace"""
 				
 				if not isinstance(father,(cl.Variable, cl.Top, cl.Bot)) :
 					if selected in father.succ:
