@@ -185,12 +185,12 @@ def saveNWorld():
 	b2.grid(column=1, row = 2, sticky = (N, S, E, W))
 
 
-def wellFormedCommand(*args) :
+def wellFormed(*args) :
 
 	global res
 	res = True
 
-	def wellFormed(formula) :
+	def wellFormedRec(formula) :
 		global res
 
 		if formula.name == "undefined" :
@@ -200,12 +200,15 @@ def wellFormedCommand(*args) :
 				for succ in formula.succ :
 					wellFormed(succ)
 
-	wellFormed(usrData.formula)
+	wellFormedRec(usrData.formula)
 
 	if res == True :
 		return	messagebox.showinfo('message',f'BRAVO TU AS REMPLI LES CASES !!!!!')
 	else :
 		return	messagebox.showinfo('message',f"T'ES NUL !!!!!")
+
+	return res
+	# RETURN res ICI DU COUP, LA C'EST POUR MONTRER QUE CA MARCHE, FAUT JUSTE ENLEVER LES QUATRE LIGNES AVANT
 
 
 def getlistvarrec(current):
@@ -604,7 +607,7 @@ def createFormulaFrame() :
 	variableListbox = Listbox(variableFrame, selectmode = 'browse', yscrollcommand = True, listvariable = listVarVar)
 	listboxScrollbar = ttk.Scrollbar(variableListbox, orient = VERTICAL, command = variableListbox.yview)
 	formulaLabel = ttk.Label(formulaMainFrame, textvariable = formTextVar, style = 'Formula.TLabel')
-	wellFormedButton = ttk.Button(formulaMainFrame, text = "Valider et passer au modèle", command = wellFormedCommand)
+	wellFormedButton = ttk.Button(formulaMainFrame, text = "Valider et passer au modèle", command = wellFormed)
 
 
 	rewindButton = ttk.Button(toolBox, text = 'Annuler le dernier changement', command = rewind)
