@@ -10,18 +10,44 @@ import os
 
 
 
-usrData = Userdata()
+usrData=Userdata()
+
+def defTitle(activeFrame):
+	"""Détermine le titre de la Fenêtre principale 
+	avec activeFrame une String nous donnant notres position dans l'interface"""
+
+	text= "formule : "
+	if not (usrData.currentFFile is None):
+		text+=(usrData.currentFFile+".formula")
+	else:
+		text+=" aucun " 
+
+	text+="| model : "
+	if not (usrData.currentWFile is None):
+		text+=(usrData.currentWFile+".model")
+	else:
+		text+=" aucun "
+	text+=" - TER 2020-2021 - Logique Intuitionniste - "
+	text+= activeFrame
+	window.title(text)
 
 
+	
+	
+	
 
 def createInter():
+	"""initialise une interprétation vide et lance l'interFace de modificationd des Formules"""
 	
-	usrData.modele = cl.World("M:0,0")
+	usrData.modele= cl.World("M:0")
 	usrData.formula = cl.Variable('undefined')
 	usrData.select = usrData.formula
 	createFormulaFrame()
 
 def openFormula():
+	"""Ouvre une formule près enregistrer a l'aide d'un navigateur de fichier et lance l'éditeur de formule
+	seuls des fichier présent dans 'assets/userdata' peutvent êtres chargé"""
+
 	currentFile=filedialog.askopenfilename(initialdir="./assets/userdata/" ,filetypes=[("formula file","*.formula")])
 	if currentFile!= ():
 		currentFile=os.path.split(currentFile)
@@ -210,13 +236,51 @@ def wellFormed(*args) :
 	return res
 	# RETURN res ICI DU COUP, LA C'EST POUR MONTRER QUE CA MARCHE, FAUT JUSTE ENLEVER LES QUATRE LIGNES AVANT
 
+			usrData.select=usrData.formula
+			createFormulaFrame()
 
-def getlistvarrec(current):
-	listvar=[]
+
+
+def	saveCInter():
+	"""sauvegade le dernier fichier de Monde et de Formule ouvert dans l'instance"""
+
+	if usrData.currentFFile ==None or usrData.currentWFile ==None:
+		messagebox.showinfo('Alert',f'Au moins un des fichers (formule/model) n\'est pas ouvert')
+	else:
+		usrData.save(ffileset=usrData.currentFFile,wfilset=usrData.currentWFile)
+
+def saveNInter():
+	"""enregistre la Formule et le Model courant dans 'assets/userdata' sous un nom choisi par l'utilisateur """
+
+	popup=Toplevel()
+	popup.grab_set()
+	popup.title("Choisiser un nom")
+	currentFile=""
+
+	def close():
+		""" anule la sauvegarde"""
+
+		popup.grab_release()
+		popup.destroy()
+		popup.update()
+	def save():
+		"""sauvegarde avec le nom choisis"""
+
+		currentFile=entry.get()
+		if currentFile !="":
+			usrData.save(ffileset=currentFile,wfileset=currentFile)
+			usrData.currentFFile=currentFile
+			usrData.currentWFile=currentFile
+			mainFrameName=window.title().rsplit('-',1)[1]
+			defTitle(mainFrameName)
+			close()
+		else:
+			t=Label(popup,text ="le nom ne peut pas être vide",fg="red")
+			t.grid(column=0,row=1,columnspan=2)
 	
-	if isinstance(current, cl.Variable):
-		if current.name!='undefined':
-			listvar.append(current.name)
+	b1=Button(popup,text="save",command= save)
+	b2=Button(popup,text="cancel",command=close)
+	entry= ttk.Entry(popup, textvariable = currentFile)
 	
 	elif not isinstance(current, (cl.Top, cl.Bot)) :
 		for succ in current.succ:
@@ -226,30 +290,63 @@ def getlistvarrec(current):
 					listvar.append(var)
 	return listvar
 def getListVarForm():
+	"""vérifie que la racine est une variable si oui on l'envoi dan un Tuple sinon on renvoi le résultat de la version récursive
+	renvoi un Tuple de Variable sans répétition sur les nom"""
+
 	listvar=[]
 	
 	if isinstance(usrData.formula, cl.Variable):
 		if usrData.formula.name!='undefined':
-			listvar.append(usrData.formula.name)
+			listvar.append(usrData.formula)
 	elif not isinstance(usrData.formula, (cl.Top,cl.Bot)):
+		def getlistvarrec(current):
+			"""vérifie si current est une variable défini et si oui l'ajoute au tuple,
+			puis relance la fonction sur les successeurs de current et concatene les résutat dans le retour
+			renvoi Tuple de Variable sans répétition sur les nom"""
+
+			listvar=[]
+	
+			if isinstance(current, cl.Variable):
+				if current.name!='undefined':
+					listvar.append(current)
+	
+			elif not isinstance(current, (cl.Top, cl.Bot)) :
+				for succ in current.succ:
+					varsuc=getlistvarrec(succ)
+					for var in varsuc:
+						a=True
+						for var2 in listvar:
+							if var2.name == var.name:
+								a=False	
+						if a:
+							listvar.append(var)
+			return listvar
+
 		for succ in usrData.formula.succ:
 			varsuc=getlistvarrec(succ)
 			for var in varsuc:
-				if not (var  in listvar):
+				a=True
+				for var2 in listvar:
+					if var2.name == var.name:
+						a=False	
+				if a:
 					listvar.append(var)
 	return listvar
 
 
 def destroyMainWindowSons() :
+	"""nétoi l'interface de ces éllément"""
+
 	for enfant in window.winfo_children():
 		if isinstance(enfant, ttk.Frame):
 			enfant.destroy()
 
 
 def createMainFrame() :
+	"""génère la page d'accueil de l'application"""
 
 	
-	window.title("TER 2020-2021 - Logique Intuitionniste - Menu principal")
+	defTitle("Menu principal")
 
 	window.columnconfigure(0, weight = 1)
 	window.rowconfigure(0, weight = 1)
@@ -258,6 +355,7 @@ def createMainFrame() :
 	# DESTRUCTION DE L'ANCIENNE FENETRE
 
 	destroyMainWindowSons()
+	
 
 	
 	# CREATION DU CADRE DE LA FENETRE PRINCIPALE
@@ -279,7 +377,8 @@ def createMainFrame() :
 
 
 def createToolbar() :
-	  
+	"""génère le menu déroulant de l'application utilisée pour sauvegarder/charger/créer des Fichier"""	  
+
   # BARRE DE MENU
 
 	barreMenu = Menu(window)
@@ -292,10 +391,13 @@ def createToolbar() :
 	fichierMenu.add_command(label = 'Ouvrir une interprétation existante', command = openInter)
 	fichierMenu.add_command(label = 'Ouvrir une formule existante', command = openFormula)
 	fichierMenu.add_command(label = 'Ouvrir un modele existant', command = openWorld)
+	fichierMenu.add_separator()
 	fichierMenu.add_command(label = "Enregistrer l'interpétation", command = saveCInter) 
 	fichierMenu.add_command(label = "Enregistrer l'interprétation sous...", command = saveNInter)
+	fichierMenu.add_separator()
 	fichierMenu.add_command(label = "Enregistrer la formule", command = saveCFormula) 
 	fichierMenu.add_command(label = "Enregistrer la formule sous...", command = saveNFromula)
+	fichierMenu.add_separator()
 	fichierMenu.add_command(label = "Enregistrer le model", command = saveCWorld) 
 	fichierMenu.add_command(label = "Enregistrer le model sous...", command = saveNWorld)
 
@@ -304,17 +406,24 @@ def createToolbar() :
 	barreMenu.add_cascade(label = 'Fichier', menu = fichierMenu)
 
 
-def createFormulaFrame() :
 
+def createFormulaFrame() :
+	"""Génère l'interface de d'édition des formules"""
 
 	class FormuleWrapper(TreeWrapper):
+		"""Couche de compatibilité entre les abres de formules et TreeView"""
+
 		def children(self,node):
+			"""Accesseur au successeur d'une nodes dans l'arbres des formules"""
+
 			if not isinstance(node, (cl.Variable, cl.Top, cl.Bot)) :
 				return [succ for succ in node.succ]
 			else:
 				return None
 
 		def label(self, node):
+			"""Définition du texte afficher sur l'objet d'interface graphique représentant la node"""
+
 			if node.name != 'undefined':
 				return node.name
 			elif node != cl.Node.classVar:
@@ -323,11 +432,15 @@ def createFormulaFrame() :
 				return None
 
 		def onClick(self,node):
+			"""Détermination de l'effet quand on click sur une node"""
+
 			usrData.select
 			usrData.select=node
 			viewer.drawTree(usrData.formula)
 
 		def bg(self, node):
+			"""Définition de la couleur de l'objet d'interface graphique représentant la node"""
+
 			if node==usrData.select:
 				return 'yellow2'
 			return 'gray77'
@@ -385,10 +498,109 @@ def createFormulaFrame() :
 				return True
 			else:
 				return False
+	
+
+	
+	def succDecide(select,newnode):
+		"""Demande a l'utilisateur si il faut conserver(Transféré) les fils de select pour newnode, 
+		et si oui a quelle position mêtre ceux que l'on garde
+		return False si select n'a aucun fils et true si il en a"""
+		if not isinstance(select,(cl.Top,cl.Bot,cl.Variable)) or isinstance(newnode,(cl.Top,cl.Bot,cl.Variable)):
+			
+			index=[ x for x in range(len(select.succ)) if select.succ[x].name!= "undefined"]
+                
+			if len(index)!=0:
+				popup=Toplevel()
+				popup.minsize(300,200)
+				popup.grab_set()
+
+				popupFrame = ttk.Frame(popup, padding = (20, 2, 20, 10))
+				popupFrame.grid(column = 0, row = 0, sticky = (N, S, E, W))
+
+				def conserver(indexold,indexnew):
+					"""transfere les fils de select choisi dont la postion est défini par indexold 
+					dans leurs nouvelles postion dans newnode défini par indexnew
+					puis mets a jour l'affichage et suprime le popup"""
+					for x in range(len(indexold)):
+						newnode.succ[indexnew[x]]=select.succ[indexold[x]]
+					viewer.drawTree(usrData.formula)
+					popup.grab_release()
+					popup.destroy()
+					popup.update()
+
+				label = ttk.Label(popupFrame,text = select.name + " a déjà "+ ("un" if len(index)==1 else "deux") +" fils "+ ("assigné" if len(index)==1 else "assignés") +" voulez vous en conserver pour "+ newnode.name +" ?", style = "Conserver.TLabel")
+
+				rien = ttk.Button(popupFrame,text="Ne rien conserver",command = lambda : conserver([], []), style = 'Conserver.TButton')
+				if isinstance(newnode,cl.Not):
+					if len(index)==1:
+						cons=ttk.Button(popupFrame,text="Conserver le fils",command = lambda : conserver([index[0]], [0]), style = 'Conserver.TButton')
+
+						cons.grid(row=1,column=0,sticky=(N, S, E, W))
+
+						label.grid(column = 0, row = 0, sticky=(N, E, W))
+						rien.grid(column=0, row=3, sticky=(N, S, E, W))                        
+
+   
+					elif len(index)==2:
+						conserver1=ttk.Button(popupFrame,text="Conserver le fils gauche", command = lambda: conserver([index[0]], [0]), style = 'Conserver.TButton')
+						conserver2=ttk.Button(popupFrame,text="Conserver le fils droit", command = lambda: conserver([index[1]], [0]), style = 'Conserver.TButton')
+
+						conserver1.grid(row=1,column=0, sticky=(N, S, E, W))
+						conserver2.grid(row=1,column=1, sticky=(N, S, E, W))
+
+						label.grid(column = 0, row = 0, columnspan = 2, sticky=(N, E, W))
+						rien.grid(column=0, row=3, columnspan = 2, sticky=(N, S, E, W))
+
+						popupFrame.columnconfigure(1, weight = 1)
+				else:
+					if len(index)==1:
+						conserverL=ttk.Button(popupFrame,text="Conserver le fils et le placer a gauche", command = lambda : conserver([index[0]], [0]), style = 'Conserver.TButton')
+						conserverR=ttk.Button(popupFrame,text="Conserver le fils et le placer a droite", command = lambda : conserver([index[0]], [1]), style = 'Conserver.TButton')
+
+						conserverL.grid(row=1,column=0,sticky=(N, S, E, W))
+						conserverR.grid(row=1,column=1,sticky=(N, S, E, W))
+
+						label.grid(column = 0, row = 0, columnspan = 2, sticky=(N, E, W))
+						rien.grid(column=0, row=3, columnspan = 2, sticky=(N, S, E, W))
+                        
+						popupFrame.columnconfigure(1, weight = 1)
+					elif len(index)==2:
+						conserver1L=ttk.Button(popupFrame,text="Conserver le fils gauche et le placer a gauche", command= lambda : conserver([index[0]], [0]), style = 'Conserver.TButton')
+						conserver1R=ttk.Button(popupFrame,text="Conserver le fils gauche et le placer a droite", command= lambda : conserver([index[0]], [1]), style = 'Conserver.TButton')
+						conserver2L=ttk.Button(popupFrame,text="Conserver le fils droit et le placer a gauche", command= lambda : conserver([index[1]], [0]), style = 'Conserver.TButton')
+						conserver2R=ttk.Button(popupFrame,text="Conserver le fils droit et le placer a droite", command= lambda : conserver([index[1]], [1]), style = 'Conserver.TButton')
+						cons=ttk.Button(popupFrame,text="Conserver les deux", command= lambda : conserver(index, [0,1]), style = 'Conserver.TButton')
+						conserverRev=ttk.Button(popupFrame,text="Conserver les deux mais inverser leurs position", command= lambda : conserver(index, [1,0]), style = 'Conserver.TButton')
+
+						conserver1L.grid(row=1,column=0,sticky=(N, S, E, W))
+						conserver1R.grid(row=1,column=1,sticky=(N, S, E, W))
+						conserver2L.grid(row=1,column=2,sticky=(N, S, E, W))
+						conserver2R.grid(row=2,column=0,sticky=(N, S, E, W))
+						cons.grid(row=2,column=1,sticky=(N, S, E, W))
+						conserverRev.grid(row=2,column=2,sticky=(N, S, E, W))
+
+						label.grid(column = 0, row = 0, columnspan = 3, sticky=(N, E, W))
+						rien.grid(column=0, row=3, columnspan = 3, sticky=(N, S, E, W))
+						popupFrame.columnconfigure(1, weight = 1)
+						popupFrame.columnconfigure(2, weight = 1)
+						
+                        
+                    
+
+				popupFrame.columnconfigure(0, weight = 1)
+				popupFrame.rowconfigure(0, weight = 1)
+
+				popup.columnconfigure(0, weight = 1)
+				popup.rowconfigure(0, weight = 1)
+				popup.title("Que faire des fils présents ?")
+				return True
+		return False
 
 	def changeEntryTextFromListbox(*args):
+		"""change le text de l'Entré de text utiliser pour determiné le nom d'une nouvelle variable dans la formule 
+		par l'entré séléctionner dans la listbox servant d'historique"""
 		if len(variableListbox.curselection()) > 0 :
-			entryText = listVar[int(variableListbox.curselection()[0])]
+			entryText = listVar[int(variableListbox.curselection()[0])].name
 			entryTextVar.set(entryText)
 
 
@@ -483,6 +695,11 @@ def createFormulaFrame() :
 			return False
 
 	def createVar(*args):
+		"""Crée une variable a la place de la node sélectionner qui auras pour nom
+		en suivant l'ordre de priorité : ce qu'il y a dans l'entré de texte, le nom selectioné dans la listbox
+		si le nom dans l'antré de texte est undefined on reveras une erreur via popup car c'est notre élément neutre
+		si aucun nom n'est entré ou selectionner on renvéras aussi une erreur par popup"""
+		
 		if varnameEntry.get()!='':
 			if varnameEntry.get()!= 'undefined':
 				var = cl.Variable(varnameEntry.get().lower())
@@ -525,48 +742,84 @@ def createFormulaFrame() :
 		else:
 			return messagebox.showinfo('message',f'Sélectionnez une variable ou entrez en une nouvelle')
 
-	def createOr(*args):
+
+	def createOr():
+		"""remplace la node selectionner par un Or en demandant que faire des sous arbre présent si il y en a
+		et si il n'y en a pas met a jours l'interface """
+		
 		var = cl.Or(cl.Variable("undefined"), cl.Variable("undefined"))
-		succDecide(usrData.select, var)
-		replace(usrData.select, var)
+		if succDecide(usrData.select, var):
+			replace(usrData.select, var)
+		else:
+			replace(usrData.select, var)
+			viewer.drawTree(usrData.formula)
+			
 	
-	def createAnd(*args):
+	def createAnd():
+		"""remplace la node selectionner par un And en demandant que faire des sous arbre présent si il y en a
+		et si il n'y en a pas met a jours l'interface """
+
 		var = cl.And(cl.Variable("undefined"), cl.Variable("undefined"))
-		succDecide(usrData.select, var)
-		replace(usrData.select, var)
+		if succDecide(usrData.select, var):
+			replace(usrData.select, var)
+		else:
+			replace(usrData.select, var)
+			viewer.drawTree(usrData.formula)
 
-	def createImp(*args):
+	def createImp():
+		"""remplace la node selectionner par une Impliquation en demandant que faire des sous arbre présent si il y en a
+		et si il n'y en a pas met a jours l'interface """
+
 		var = cl.Imp(cl.Variable("undefined"), cl.Variable("undefined"))
-		succDecide(usrData.select, var)
-		replace(usrData.select, var)
+		if succDecide(usrData.select, var):
+			replace(usrData.select, var)
+		else:
+			replace(usrData.select, var)
+			viewer.drawTree(usrData.formula)
 
-	def createNot(*args):
+	def createNot():
+		"""remplace la node selectionner par un Not en demandant que faire des sous arbre présent si il y en a
+		et si il n'y en a pas met a jours l'interface """
+
 		var = cl.Not(cl.Variable("undefined"))
-		succDecide(usrData.select, var)
-		replace(usrData.select, var)
+		if succDecide(usrData.select, var):
+			replace(usrData.select, var)
+		else:
+			replace(usrData.select, var)
+			viewer.drawTree(usrData.formula)
 
-	def createTop(*args):
+	def createTop():
+		"""remplace la node selectionner par un Top et mets a jour l'interface"""
+
 		var = cl.Top()
 		replace(usrData.select, var)
+		viewer.drawTree(usrData.formula)
 
-	def createBot(*args):
+	def createBot():
+		"""remplace la node selectionner par un Bot et  met a jours l'interface """
+
 		var = cl.Bot()
 		replace(usrData.select, var)
+		viewer.drawTree(usrData.formula)
 	
 	
-	window.title("TER 2020-2021 - Logique Intuitionniste - Éditeur de formule")
+
+
+
+	defTitle("Éditeur de formule")
 
 
 	# DESTRUCTION DE l'ANCIENNE FENETRE
 
 	destroyMainWindowSons()
+	
 
 
 	# VARIABLES DE CONTROLE
 
 	listVar = getListVarForm()
 	
-	listVarVar = StringVar(value = listVar)
+	listVarVar = StringVar(value = [var.name for var in listVar])
 
 	entryText = ""
 	entryTextVar = StringVar(value = entryText)
@@ -600,8 +853,8 @@ def createFormulaFrame() :
 	Bouton_Bot = ttk.Button(toolsFrame, text = "Bot", command = createBot)
 
 
-	variableFrame =ttk.Frame(toolBox)
 
+	variableFrame =ttk.Frame(toolBox)
 	varnameEntry = ttk.Entry(variableFrame, textvariable = entryTextVar)
 	createVarButton = ttk.Button(variableFrame, text='Ajouter', command = createVar)
 	variableListbox = Listbox(variableFrame, selectmode = 'browse', yscrollcommand = True, listvariable = listVarVar)
@@ -633,6 +886,14 @@ def createFormulaFrame() :
 	toolsFrame.pack(fill = 'both', expand = True)
 	variableFrame.pack(fill = 'both', expand = True)
 	rewindButton.pack(side = BOTTOM, fill = X)
+
+
+	Bouton_Not.grid(column = 0, row = 0, sticky = (N, S, E, W))
+	Bouton_Or.grid(column = 0, row = 1, sticky = (N, S, E, W))
+	Bouton_And.grid(column = 0, row = 2, sticky = (N, S, E, W))
+	Bouton_Imp.grid(column = 0, row = 3, sticky = (N, S, E, W))
+	Bouton_Top.grid(column = 0, row = 4, sticky = (N, S, E, W))
+	Bouton_Bot.grid(column = 0, row = 5, sticky = (N, S, E, W))
 
 
 	Bouton_Not.grid(column = 0, row = 0, sticky = (N, S, E, W))
@@ -695,8 +956,8 @@ def createModelFrame() :
 
 	class ModelWrapper(TreeWrapper):
 		def children(self,node):
-			if len(self._sons)!=0:
-				return self._sons
+			if len(node._sons)!=0:
+				return node._sons
 			else:
 				return None
 
@@ -709,132 +970,111 @@ def createModelFrame() :
 		def onClick(self,node):
 			
 			usrData.select=node
-			viewer.drawTree(monde)
+			viewer.drawTree(usrData.model)
+			variableWorld()
 
 		def bg(self, node):
 			if node==usrData.select:
 				return 'yellow2'
 			return 'gray77'
 
+	def addSon():
+		newSonName = usrData.select.name + '-'+str(len(usrData.select._sons))
+		usrData.select.sons = newSonName
+		viewer.drawTree(usrData.model)
+		variableWorld()
+
+
+	
+	def removeSelfAlt(current):
+		if usrData.select in current._sons :
+			temp = []
+			for i in current._sons :
+				if i != usrData.select :
+					temp.append(i)
+			current._sons = temp
+			viewer.drawTree(usrData.model)
+		else :
+			for j in current._sons :
+				removeSelfAlt(j)
+
+	def removeSelf():
+		if (usrData.select != usrData.model):
+			removeSelfAlt(usrData.model)
+		else :
+			messagebox.showinfo("",f"Vous ne pouvez pas supprimer le monde racine")
+
+
+	def variableWorld():
+
+		def valider ():
+			usrData.select._vars=[]
+			usrData.select.vars = [listvar[i] for i in frameCheck.curselection()]
+			variableWorld()
+
+		variableT.config(text=usrData.select.name+' : \n'+ str(usrData.select._vars))
+		variableV.config(text=usrData.select.name+' : \n'+ str(usrData.select._vars))
+		
+		frameCheck = Listbox(variableFrame, selectmode = MULTIPLE, yscrollcommand = True)
+		
+		frameCheck.grid(column = 0, row = 1, sticky = (N, S, E, W))
+
+		listvar = getListVarForm()
+		
+		for i in range(len(listvar)) :
+			
+			frameCheck.insert(i,listvar[i].name)
+		
+			for vars in usrData.select._vars :
+				if listvar[i].name == vars.name:
+					frameCheck.selection_set(i)
+		variablesbutton = ttk.Button(variableFrame, text = "Valider", command = valider)
+		variablesbutton.grid(column = 0, row = 2 , sticky = (N, S, E, W))
+
 	def validate(*args) :
-		if cl.valids(usrData.formula, usrData.modele):
+		if valids(usrData.formula,usrData.model):
 			return messagebox.showinfo('message',f"La formule est valide pour le modèle sélectionné")
 		return messagebox.showinfo('message',f"La formule n'est pas valide pour le modèle sélectionné")
 
+
+
+
+
+
+
+	defTitle("Éditeur de Model")
 	# DESTRUCTION DE l'ANCIENNE FENETRE
 
 	destroyMainWindowSons()
 
 
-	# CREATION DU CADRE DE LA PAGE CREER FORMULE
+
+	# CREATION DU CADRE DE LA PAGE CREER MODEL
 
 	worldMainFrame = ttk.Frame(window, padding = (20, 2, 20, 0))
 
 
-	# CREATION DES ELEMENTS DU CADRE FORMULE
-
-	worldTitleFrame = ttk.Label(worldMainFrame, text='Editeur De Mondes', style='Title.TLabel')
-	graphFrame = ttk.Frame(worldMainFrame)
-	toolBox = ttk.Notebook(worldMainFrame)
-	toolsFrame = ttk.Frame(toolBox)
-	variableFrame = ttk.Frame(toolBox)
-	varnameEntry = ttk.Entry(variableFrame)
-	validatebutton = ttk.Button(worldMainFrame, text='Valider', command = validate)
-	backbutton = ttk.Button(worldMainFrame, text="Revenir à la formule", command = createFormulaFrame)
-	
-
-
-	# CREATION DES FRAMES DE REMPLISSAGE DES VIDES
-
-
-
-
-	# PLACEMENT DU CADRE (FRAME) PRINCIPAL DANS LA FENETRE (window)
-
-	worldMainFrame.grid(column = 0, row = 0, sticky=(N, S, E, W))
-
-
-	# PLACEMENT DES ELEMENTS DU CADRE FORMULE DANS LA GRILLE
-
-	worldTitleFrame.grid(column = 0, row = 0, columnspan = 2, sticky = (N, S, E, W))
-	graphFrame.grid(column = 0, row = 1, sticky = (N, S, E, W), pady = 20, padx = (20, 0))
-
-	toolBox.grid(column = 1, row = 1, sticky = (N, S, E, W), pady = 20, padx = 20)
-	toolsFrame.pack(fill = 'both', expand = True)
-	variableFrame.pack(fill = 'both', expand = True)
-	toolBox.add(toolsFrame, text = 'Outils')
-	toolBox.add(variableFrame, text = 'Variables')
-	validatebutton.grid(column = 2, row = 2, sticky = (N, S, E, W))
-	backbutton.grid(column = 2, row = 1, sticky= (N, S, E, W))
-	
-
-
-	# CONFIGURATION DES ELEMENTS DE LA GRILLE (changement de la taille de la fenêtre)
-
-	worldMainFrame.columnconfigure(0, weight = 1)
-	worldMainFrame.rowconfigure(1, weight = 1)
-
-
-	# PARTIE FONCTIONNELLE
-
-	listvar = getlistvar()
-
-	
-
-	fwrap = ModelWrapper()	
-	viewer = TreeViewer(fwrap, graphFrame, world)
-
-def createModelFrame() :
-
-	global formula
-	global select
-	global worlds
-
-	class ModeleWrapper(TreeWrapper):
-		def children(self,node):
-			if len(self._sons)!=0:
-				return self._sons
-			else:
-				return None
-
-		def label(self, node):
-			if node.name != 'undefined':
-				return node.name
-			else:
-				return None
-
-		def onClick(self,node):
-			global select
-			select=node
-			viewer.drawTree(monde)
-
-		def bg(self, node):
-			if node==select:
-				return 'yellow2'
-			return 'gray77'
-
-
-
-	# DESTRUCTION DE l'ANCIENNE FENETRE
-
-	destroyMainWindowSons()
-
-
-	# CREATION DU CADRE DE LA PAGE CREER FORMULE
-
-	worldMainFrame = ttk.Frame(window, padding = (20, 2, 20, 0))
-
-
-	# CREATION DES ELEMENTS DU CADRE FORMULE
+	# CREATION DES ELEMENTS DU CADRE MODEL
 
 	worldTitleFrame = ttk.Label(worldMainFrame, text='Editeur De Mondes', style='Titre.TLabel')
 	graphFrame = ttk.Frame(worldMainFrame)
 	toolBox = ttk.Notebook(worldMainFrame)
 	toolsFrame = ttk.Frame(toolBox)
+
+	variableT=Label(toolsFrame, justify=LEFT)
+	Bouton_AjoutFils = ttk.Button(toolsFrame, text = "Add son", command = addSon)
+	Bouton_RetraitSelf = ttk.Button(toolsFrame, text = "Remove", command = removeSelf)
+
 	variableFrame = ttk.Frame(toolBox)
-	varnameEntry = ttk.Entry(variableFrame)
-	createVarButton = ttk.Button(variableFrame, text='Créer', command = createVar)
-	variableListbox = Listbox(variableFrame, selectmode = 'single', yscrollcommand = True)
+	
+	variableV=Label(variableFrame, justify=LEFT)
+
+
+	validatebutton = ttk.Button(worldMainFrame, text='Valider', command = validate)
+	backbutton = ttk.Button(worldMainFrame, text="Revenir à la formule", command = createFormulaFrame)
+
+	
+
 
 
 	# CREATION DES FRAMES DE REMPLISSAGE DES VIDES
@@ -858,8 +1098,14 @@ def createModelFrame() :
 	toolBox.add(toolsFrame, text = 'Outils')
 	toolBox.add(variableFrame, text = 'Variables')
 
+	Bouton_AjoutFils.grid(column = 0, row = 1, sticky = (N, S, E, W))
+	Bouton_RetraitSelf.grid(column = 0, row = 2, sticky = (N, S, E, W))
 	
+	variableT.grid(column=0,row=0,columnspan=2,sticky=NSEW)
+	variableV.grid(column=0,row=0,columnspan=2,sticky=NSEW)
 
+	validatebutton.grid(column = 1, row = 3, sticky = (N, S, E, W))
+	backbutton.grid(column = 1, row = 2, sticky= (N, S, E, W))
 
 	# CONFIGURATION DES ELEMENTS DE LA GRILLE (changement de la taille de la fenêtre)
 
@@ -869,12 +1115,10 @@ def createModelFrame() :
 
 	# PARTIE FONCTIONNELLE
 
-	listvar = getlistvar()
 
-	
-
-	fwrap=WorldWrapper()	
-	viewer = TreeViewer(fwrap, graphFrame, world)
+	mwrap=ModelWrapper()	
+	viewer = TreeViewer(mwrap, graphFrame, usrData.model)
+	variableWorld()
 
 
 
@@ -891,6 +1135,7 @@ window.minsize(720, 360)
 createToolbar()
 
 createMainFrame()
+
 
 
 ###############################################
