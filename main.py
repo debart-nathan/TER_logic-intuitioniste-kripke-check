@@ -117,6 +117,7 @@ def openInter():
 
 def	saveCInter():
 	"""sauvegade le dernier fichier de Monde et de Formule ouvert dans l'instance"""
+
 	if usrData.currentFFile ==None or usrData.currentWFile ==None:
 		messagebox.showinfo('Alert',f'Au moins un des fichers (formule/model) n\'est pas ouvert')
 	else:
@@ -124,6 +125,7 @@ def	saveCInter():
 
 def saveNInter():
 	"""enregistre la Formule et le Model courant dans 'assets/userdata' sous un nom choisi par l'utilisateur """
+
 	popup=Toplevel()
 	popup.grab_set()
 	popup.title("Choisiser un nom")
@@ -131,11 +133,13 @@ def saveNInter():
 
 	def close():
 		""" anule la sauvegarde"""
+
 		popup.grab_release()
 		popup.destroy()
 		popup.update()
 	def save():
 		"""sauvegarde avec le nom choisis"""
+
 		currentFile=entry.get()
 		if currentFile !="":
 			usrData.save(ffileset=currentFile,wfileset=currentFile)
@@ -161,6 +165,7 @@ def saveNInter():
 
 def	saveCFormula():
 	"""Enregistre la Formule courrante dans le dernier Fichier Formule ouvert de l'instance"""
+
 	if usrData.currentFFile ==None :
 		messagebox.showinfo('Alert',f'Aucune fichier formule ouvert')
 	else:
@@ -168,6 +173,7 @@ def	saveCFormula():
 
 def saveNFromula():
 	"""enregistre la Formule courante dans 'assets/userdata' sous un nom choisi par l'utilisateur """
+
 	popup=Toplevel()
 	popup.grab_set()
 	popup.title("Choisiser un nom")
@@ -201,6 +207,7 @@ def saveNFromula():
 
 def	saveCWorld():
 	"""Enregistre le Model courrant dans le dernier Fichier Model ouvert de l'instance"""
+
 	if  usrData.currentWFile ==None:
 		messagebox.showinfo('Alert',f'Aucun fichier model ouvert')
 	else:
@@ -208,6 +215,7 @@ def	saveCWorld():
 
 def saveNWorld():
 	"""enregistre le Model courant dans 'assets/userdata' sous un nom choisi par l'utilisateur """
+
 	popup=Toplevel()
 	popup.grab_set()
 	popup.title("Choisiser un nom")
@@ -244,41 +252,42 @@ def saveNWorld():
 
 
 
-def getlistvarrec(current):
-	"""vérifie si current est une variable défini et si oui l'ajoute au tuple,
-	puis relance la fonction sur les successeurs de current et concatene les résutat dans le retour
 
-	renvoi Tuple de Variable sans répétition sur les nom"""
-	listvar=[]
-	
-	if isinstance(current, cl.Variable):
-		if current.name!='undefined':
-			
-			listvar.append(current)
-	
-	elif not isinstance(current, (cl.Top, cl.Bot)) :
-		for succ in current.succ:
-			varsuc=getlistvarrec(succ)
-			for var in varsuc:
-				a=True
-				for var2 in listvar:
-					if var2.name == var.name:
-						a=False	
-				if a:
-					listvar.append(var)
-	
-	return listvar
 
 
 def getListVarForm():
 	"""vérifie que la racine est une variable si oui on l'envoi dan un Tuple sinon on renvoi le résultat de la version récursive
 	renvoi un Tuple de Variable sans répétition sur les nom"""
+
 	listvar=[]
 	
 	if isinstance(usrData.formula, cl.Variable):
 		if usrData.formula.name!='undefined':
 			listvar.append(usrData.formula)
 	elif not isinstance(usrData.formula, (cl.Top,cl.Bot)):
+		def getlistvarrec(current):
+			"""vérifie si current est une variable défini et si oui l'ajoute au tuple,
+			puis relance la fonction sur les successeurs de current et concatene les résutat dans le retour
+			renvoi Tuple de Variable sans répétition sur les nom"""
+
+			listvar=[]
+	
+			if isinstance(current, cl.Variable):
+				if current.name!='undefined':
+					listvar.append(current)
+	
+			elif not isinstance(current, (cl.Top, cl.Bot)) :
+				for succ in current.succ:
+					varsuc=getlistvarrec(succ)
+					for var in varsuc:
+						a=True
+						for var2 in listvar:
+							if var2.name == var.name:
+								a=False	
+						if a:
+							listvar.append(var)
+			return listvar
+
 		for succ in usrData.formula.succ:
 			varsuc=getlistvarrec(succ)
 			for var in varsuc:
@@ -293,6 +302,7 @@ def getListVarForm():
 
 def destroyMainWindowSons() :
 	"""nétoi l'interface de ces éllément"""
+
 	for enfant in window.winfo_children():
 		if isinstance(enfant, ttk.Frame):
 			enfant.destroy()
@@ -334,6 +344,7 @@ def createMainFrame() :
 
 def createToolbar() :
 	"""génère le menu déroulant de l'application utilisée pour sauvegarder/charger/créer des Fichier"""	  
+
   # BARRE DE MENU
 
 	barreMenu = Menu(window)
@@ -363,16 +374,22 @@ def createToolbar() :
 
 
 def createFormulaFrame() :
-
+	"""Génère l'interface de d'édition des formules"""
 
 	class FormuleWrapper(TreeWrapper):
+		"""Couche de compatibilité entre les abres de formules et TreeView"""
+
 		def children(self,node):
+			"""Accesseur au successeur d'une nodes dans l'arbres des formules"""
+
 			if not isinstance(node, (cl.Variable, cl.Top, cl.Bot)) :
 				return [succ for succ in node.succ]
 			else:
 				return None
 
 		def label(self, node):
+			"""Définition du texte afficher sur l'objet d'interface graphique représentant la node"""
+
 			if node.name != 'undefined':
 				return node.name
 			elif node != cl.Node.classVar:
@@ -381,36 +398,49 @@ def createFormulaFrame() :
 				return None
 
 		def onClick(self,node):
+			"""Détermination de l'effet quand on click sur une node"""
+
 			usrData.select
 			usrData.select=node
 			viewer.drawTree(usrData.formula)
 
 		def bg(self, node):
+			"""Définition de la couleur de l'objet d'interface graphique représentant la node"""
+
 			if node==usrData.select:
 				return 'yellow2'
 			return 'gray77'
 
 
-	def replacerec(father,selected,elem):
-		if not isinstance(father,(cl.Variable, cl.Top, cl.Bot)) :
-			if selected in father.succ:
-				father.succ=[elem if x==selected else x for x in father.succ]
-				return True
-			else:
-				for succ in father.succ:
-					if replacerec(succ,selected,elem):
-						return True
-				return False
-
-		return False
+	
 
 
 	def replace(selected,elem):
+		"""partie non récursive de replace qui regarde si l'élément sélectonner par un nouvel elelment 
+		dans le tuple des succ de ses pêre en conservant la position
+		renvoi False si selected n'a pas était trouvé"""
+
 		if usrData.formula==selected:
 			usrData.formula=elem
 			usrData.select=elem
 			return True
 		else:
+			def replacerec(father,selected,elem):
+				"""partie récursive de replace qui permet de remplacer un objet(selected) par un autre(elem) 
+				en le remplacent dans le tuple des successeurs de ces père tout en gardant la même position dans ce tuple
+				renvoi False si selected n'a pas était trouvé"""
+				
+				if not isinstance(father,(cl.Variable, cl.Top, cl.Bot)) :
+					if selected in father.succ:
+						father.succ=[elem if x==selected else x for x in father.succ]
+						return True
+					else:
+						for succ in father.succ:
+							if replacerec(succ,selected,elem):
+								return True
+						return False
+				return False
+
 			if replacerec(usrData.formula,selected,elem):
 				usrData.select=elem
 				return True
@@ -420,6 +450,9 @@ def createFormulaFrame() :
 
 	
 	def succDecide(select,newnode):
+		"""Demande a l'utilisateur si il faut conserver(Transféré) les fils de select pour newnode, 
+		et si oui a quelle position mêtre ceux que l'on garde
+		return False si select n'a aucun fils et true si il en a"""
 		if not isinstance(select,(cl.Top,cl.Bot,cl.Variable)) or isinstance(newnode,(cl.Top,cl.Bot,cl.Variable)):
 			
 			index=[ x for x in range(len(select.succ)) if select.succ[x].name!= "undefined"]
@@ -427,12 +460,15 @@ def createFormulaFrame() :
 			if len(index)!=0:
 				popup=Toplevel()
 				popup.minsize(300,200)
-                # popup.maxsize(300,200)
 				popup.grab_set()
 
 				popupFrame = ttk.Frame(popup, padding = (20, 2, 20, 10))
 				popupFrame.grid(column = 0, row = 0, sticky = (N, S, E, W))
+
 				def conserver(indexold,indexnew):
+					"""transfere les fils de select choisi dont la postion est défini par indexold 
+					dans leurs nouvelles postion dans newnode défini par indexnew
+					puis mets a jour l'affichage et suprime le popup"""
 					for x in range(len(indexold)):
 						newnode.succ[indexnew[x]]=select.succ[indexold[x]]
 					viewer.drawTree(usrData.formula)
@@ -509,12 +545,18 @@ def createFormulaFrame() :
 		return False
 
 	def changeEntryTextFromListbox(*args):
+		"""change le text de l'Entré de text utiliser pour determiné le nom d'une nouvelle variable dans la formule 
+		par l'entré séléctionner dans la listbox servant d'historique"""
 		if len(variableListbox.curselection()) > 0 :
 			entryText = listVar[int(variableListbox.curselection()[0])].name
 			entryTextVar.set(entryText)
 
 
 	def createVar(*args):
+		"""Crée une variable a la place de la node sélectionner qui auras pour nom
+		en suivant l'ordre de priorité : ce qu'il y a dans l'entré de texte, le nom selectioné dans la listbox
+		si le nom dans l'antré de texte est undefined on reveras une erreur via popup car c'est notre élément neutre
+		si aucun nom n'est entré ou selectionner on renvéras aussi une erreur par popup"""
 		
 		if varnameEntry.get()!='':
 			if varnameEntry.get()!= 'undefined':
@@ -523,9 +565,11 @@ def createFormulaFrame() :
 
 					viewer.drawTree(usrData.formula)
 					temp=[]
-					for i in range(len(listVar)):
+					i=0
+					while i  <len(listVar):
 						if listVar[i].name == var.name:
 							listVar.pop(i)
+						i+=1
 					
 					listVar.insert(0,var)
 					listVarVar.set([var.name for var in listVar])
@@ -564,6 +608,9 @@ def createFormulaFrame() :
 
 
 	def createOr():
+		"""remplace la node selectionner par un Or en demandant que faire des sous arbre présent si il y en a
+		et si il n'y en a pas met a jours l'interface """
+		
 		var = cl.Or(cl.Variable("undefined"), cl.Variable("undefined"))
 		if succDecide(usrData.select, var):
 			replace(usrData.select, var)
@@ -573,6 +620,9 @@ def createFormulaFrame() :
 			
 	
 	def createAnd():
+		"""remplace la node selectionner par un And en demandant que faire des sous arbre présent si il y en a
+		et si il n'y en a pas met a jours l'interface """
+
 		var = cl.And(cl.Variable("undefined"), cl.Variable("undefined"))
 		if succDecide(usrData.select, var):
 			replace(usrData.select, var)
@@ -581,6 +631,9 @@ def createFormulaFrame() :
 			viewer.drawTree(usrData.formula)
 
 	def createImp():
+		"""remplace la node selectionner par une Impliquation en demandant que faire des sous arbre présent si il y en a
+		et si il n'y en a pas met a jours l'interface """
+
 		var = cl.Imp(cl.Variable("undefined"), cl.Variable("undefined"))
 		if succDecide(usrData.select, var):
 			replace(usrData.select, var)
@@ -589,6 +642,9 @@ def createFormulaFrame() :
 			viewer.drawTree(usrData.formula)
 
 	def createNot():
+		"""remplace la node selectionner par un Not en demandant que faire des sous arbre présent si il y en a
+		et si il n'y en a pas met a jours l'interface """
+
 		var = cl.Not(cl.Variable("undefined"))
 		if succDecide(usrData.select, var):
 			replace(usrData.select, var)
@@ -597,11 +653,15 @@ def createFormulaFrame() :
 			viewer.drawTree(usrData.formula)
 
 	def createTop():
+		"""remplace la node selectionner par un Top et mets a jour l'interface"""
+
 		var = cl.Top()
 		replace(usrData.select, var)
 		viewer.drawTree(usrData.formula)
 
 	def createBot():
+		"""remplace la node selectionner par un Bot et  met a jours l'interface """
+
 		var = cl.Bot()
 		replace(usrData.select, var)
 		viewer.drawTree(usrData.formula)
