@@ -1,4 +1,5 @@
 import classes as cl
+import copy
 from savefilesystem import *
 from graph_view import TreeViewer,TreeWrapper
 from tkinter import *
@@ -60,13 +61,10 @@ def openFormula():
 			usrData.select=usrData.formula
 
 			if usrData.model==None:
-				usrData.model=cl.World("M:0")
+				usrData.model=cl.World("M:0,0")
 			createFormulaFrame()
 
 def openWorld():
-	"""Ouvre un Model près enregistrer a l'aide d'un navigateur de fichier et lance l'éditeur de Model si la formule est bien construite(sinon lance l'éditeur de formule)
-	seuls des fichier présent dans 'assets/userdata' peutvent êtres chargé"""
-
 	currentFile= filedialog.askopenfilename(initialdir="./assets/userdata/" ,filetypes=[("model file","*.model")])
 	if currentFile!= ():
 		currentFile=os.path.split(currentFile)
@@ -81,18 +79,14 @@ def openWorld():
 			if usrData.formula==None:
 				usrData.formula=cl.Variable("undefined")
 
-			#if bienConstruite():
-			usrData.select=usrData.model
-			createModelFrame()
-			#else:
-			#	usrData.select=usrData.formula
-			#	createFormulaFrame()
-	
+			if wellFormed() :
+				usrData.select=usrData.model
+				createModelFrame()
+			else:
+				usrData.select=usrData.formula
+				createFormulaFrame()
 
 def openInter():
-	"""ouvre successivement une Formule et un Model prés enregistré puis lance l'interface d'édition de Formule
-	seuls des fichier présent dans 'assets/userdata' peutvent êtres chargé"""
-
 	currentFile= filedialog.askopenfilename(initialdir="./assets/userdata/" ,filetypes=[("formula file","*.formula")])
 	currentFile2= filedialog.askopenfilename(initialdir="./assets/userdata/" ,filetypes=[("model file","*.model")])
 	if currentFile!= () or currentFile2!= ():
@@ -109,6 +103,138 @@ def openInter():
 
 			usrData.load(wfileset=currentFile2)
 			usrData.currentWFile=currentFile2
+
+			usrData.select=usrData.formula
+			createFormulaFrame()
+
+def	saveCInter():
+	if usrData.currentFFile ==None or usrData.currentWFile ==None:
+		messagebox.showinfo('Alert',f'Au moins un des fichers (formule/model) n\'est pas ouvert')
+	else:
+		usrData.save(ffileset=usrData.currentFFile,wfilset=usrData.currentWFile)
+
+def saveNInter():
+	popup=Toplevel()
+	popup.grab_set()
+	popup.title("Choisiser un nom")
+	currentFile=""
+
+	def close():
+		popup.grab_release()
+		popup.destroy()
+		popup.update()
+	def save():
+		currentFile=entry.get()
+		if currentFile !="":
+			usrData.save(ffileset=currentFile,wfileset=currentFile)
+			usrData.currentFFile=currentFile
+			usrData.currentWFile=currentFile
+			close()
+		else:
+			t=Label(popup,text ="le nom ne peut pas être vide",fg="red")
+			t.grid(column=0,row=1)
+	
+	b1=Button(popup,text="save",command= save)
+	b2=Button(popup,text="cancel",command=close)
+	entry= ttk.Entry(popup, textvariable = currentFile)
+	
+	entry.grid(column=0, row = 0, sticky = (N, S, E, W))
+	b1.grid(column=0, row = 2, sticky = (N, S, E, W))
+	b2.grid(column=1, row = 2, sticky = (N, S, E, W))
+
+def	saveCFormula():
+	if usrData.currentFFile == None :
+		messagebox.showinfo('Alert',f'Aucune fichier formule ouvert')
+	else:
+		usrData.save(ffileset=usrData.currentFFile)
+
+def saveNFromula():
+	popup=Toplevel()
+	popup.grab_set()
+	popup.title("Choisissez un nom")
+	currentFile=""
+
+	def close():
+		popup.grab_release()
+		popup.destroy()
+		popup.update()
+	def save():
+		currentFile=entry.get()
+		if currentFile !="":
+			usrData.save(ffileset=currentFile)
+			usrData.currentFFile=currentFile
+			close()
+		else:
+			t = Label(popup, text ="Le nom ne peut pas être vide", fg = "red")
+			t.grid(column=0, row = 1)
+	
+	b1=Button(popup,text="save", command = save)
+	b2=Button(popup,text="cancel", command =close)
+	entry= ttk.Entry(popup, textvariable = currentFile)
+	
+	entry.grid(column=0, row = 0, sticky = (N, S, E, W))
+	b1.grid(column=0, row = 2, sticky = (N, S, E, W))
+	b2.grid(column=1, row = 2, sticky = (N, S, E, W))
+
+def	saveCWorld():
+	if  usrData.currentWFile ==None:
+		messagebox.showinfo('Alert',f'Aucun fichier model ouvert')
+	else:
+		usrData.save(wfilset=usrData.currentWFile)
+
+def saveNWorld():
+	popup=Toplevel()
+	popup.grab_set()
+	popup.title("Choisiser un nom")
+	currentFile=""
+
+	def close():
+		popup.grab_release()
+		popup.destroy()
+		popup.update()
+	def save():
+		currentFile=entry.get()
+		if currentFile !="":
+			usrData.save(wfileset=currentFile)
+			usrData.currentWFile=currentFile
+			close
+		else:
+			t=Label(popup,text ="le nom ne peut pas être vide",fg="red")
+			t.grid(column=0,row=1)
+	
+	b1=Button(popup,text="save",command= save)
+	b2=Button(popup,text="cancel",command=close)
+	entry= ttk.Entry(popup, textvariable = currentFile)
+	
+	entry.grid(column=0, row = 0, sticky = (N, S, E, W))
+	b1.grid(column=0, row = 2, sticky = (N, S, E, W))
+	b2.grid(column=1, row = 2, sticky = (N, S, E, W))
+
+
+def wellFormed(*args) :
+
+	global res
+	res = True
+
+	def wellFormedRec(formula) :
+		global res
+
+		if formula.name == "undefined" :
+			res = False
+		else :
+			if not isinstance(formula, (cl.Variable, cl.Top, cl.Bot)):
+				for succ in formula.succ :
+					wellFormed(succ)
+
+	wellFormedRec(usrData.formula)
+
+	if res == True :
+		return	messagebox.showinfo('message',f'BRAVO TU AS REMPLI LES CASES !!!!!')
+	else :
+		return	messagebox.showinfo('message',f"T'ES NUL !!!!!")
+
+	return res
+	# RETURN res ICI DU COUP, LA C'EST POUR MONTRER QUE CA MARCHE, FAUT JUSTE ENLEVER LES QUATRE LIGNES AVANT
 
 			usrData.select=usrData.formula
 			createFormulaFrame()
@@ -156,105 +282,13 @@ def saveNInter():
 	b2=Button(popup,text="cancel",command=close)
 	entry= ttk.Entry(popup, textvariable = currentFile)
 	
-	entry.grid(column=0, row = 0,columnspan=2, sticky = (N, S, E, W))
-	b1.grid(column=0, row = 2, sticky = (N, S, E, W))
-	b2.grid(column=1, row = 2, sticky = (N, S, E, W))
-	
-	
-
-
-def	saveCFormula():
-	"""Enregistre la Formule courrante dans le dernier Fichier Formule ouvert de l'instance"""
-
-	if usrData.currentFFile ==None :
-		messagebox.showinfo('Alert',f'Aucune fichier formule ouvert')
-	else:
-		usrData.save(ffileset=usrData.currentFFile)
-
-def saveNFromula():
-	"""enregistre la Formule courante dans 'assets/userdata' sous un nom choisi par l'utilisateur """
-
-	popup=Toplevel()
-	popup.grab_set()
-	popup.title("Choisiser un nom")
-	currentFile=""
-	
-
-	def close():
-		popup.grab_release()
-		popup.destroy()
-		popup.update()
-	def save():
-		currentFile=entry.get()
-		if currentFile !="":
-			usrData.save(ffileset=currentFile)
-			usrData.currentFFile=currentFile
-			mainFrameName=window.title().rsplit('-',1)[1]
-			defTitle(mainFrameName)
-			close()
-		else:
-			t=Label(popup,text ="le nom ne peut pas être vide",fg="red")
-			t.grid(column=0,row=1,columnspan=2)
-	
-	b1=Button(popup,text="save",command= save)
-	b2=Button(popup,text="cancel",command=close)
-	entry= ttk.Entry(popup, textvariable = currentFile)
-	
-	entry.grid(column=0, row = 0,columnspan=2, sticky = (N, S, E, W))
-	b1.grid(column=0, row = 2, sticky = (N, S, E, W))
-	b2.grid(column=1, row = 2, sticky = (N, S, E, W))
-
-
-def	saveCWorld():
-	"""Enregistre le Model courrant dans le dernier Fichier Model ouvert de l'instance"""
-
-	if  usrData.currentWFile ==None:
-		messagebox.showinfo('Alert',f'Aucun fichier model ouvert')
-	else:
-		usrData.save(wfilset=usrData.currentWFile)
-
-def saveNWorld():
-	"""enregistre le Model courant dans 'assets/userdata' sous un nom choisi par l'utilisateur """
-
-	popup=Toplevel()
-	popup.grab_set()
-	popup.title("Choisiser un nom")
-	currentFile=""
-
-	def close():
-		popup.grab_release()
-		popup.destroy()
-		popup.update()
-	def save():
-		currentFile=entry.get()
-		if currentFile !="":
-			usrData.save(wfileset=currentFile)
-			usrData.currentWFile=currentFile
-			mainFrameName=window.title().rsplit('-',1)[1]
-			defTitle(mainFrameName)
-			close
-		else:
-			t=Label(popup,text ="le nom ne peut pas être vide",fg="red")
-			t.grid(column=0,row=1,columnspan=2)
-	
-	b1=Button(popup,text="save",command= save)
-	b2=Button(popup,text="cancel",command=close)
-	entry= ttk.Entry(popup, textvariable = currentFile)
-	
-	entry.grid(column=0, row = 0,columnspan=2, sticky = (N, S, E, W))
-	b1.grid(column=0, row = 2, sticky = (N, S, E, W))
-	b2.grid(column=1, row = 2, sticky = (N, S, E, W))
-
-
-
-
-
-
-
-
-
-
-
+	elif not isinstance(current, (cl.Top, cl.Bot)) :
+		for succ in current.succ:
+			varsuc=getlistvarrec(succ)
+			for var in varsuc:
+				if not (var  in listvar):
+					listvar.append(var)
+	return listvar
 def getListVarForm():
 	"""vérifie que la racine est une variable si oui on l'envoi dan un Tuple sinon on renvoi le résultat de la version récursive
 	renvoi un Tuple de Variable sans répétition sur les nom"""
@@ -332,7 +366,7 @@ def createMainFrame() :
 	
 	# TITRE DE LA FENÊTRE PRINCIPALE
 
-	mainFrameTitle = ttk.Label(mainFrame, text = 'Logique Intuitionniste TER 2020-2021', style='Titre.TLabel')
+	mainFrameTitle = ttk.Label(mainFrame, text = 'Logique Intuitionniste TER 2020-2021', style='Title.TLabel')
 	mainFrameTitle.grid(column = 0, row = 0, columnspan = 2, sticky =(E, W))
 
 
@@ -412,33 +446,53 @@ def createFormulaFrame() :
 			return 'gray77'
 
 
+
+	def rewind(*args) :
+		global savedFormula
+		if savedFormula == None :
+			return messagebox.showinfo('message',f'Pas de retour en arrière possible')
+		else :
+			usrData.formula = savedFormula
+			savedFormula = None
+			updateTextForm()
+			viewer.drawTree(usrData.formula)
+
+	def saveFormula(*args):
+		global savedFormula
+		savedFormula = copy.copy(usrData.formula)
+
+	def updateTextForm(*args):
+
+		formText = usrData.formula.__repr__()
+		formTextVar.set(formText)
+
+	def replacerec(father,selected,elem):
+		if not isinstance(father,(cl.Variable, cl.Top, cl.Bot)) :
+			if selected in father.succ:
+				father.succ=[elem if x==selected else x for x in father.succ]
+				
+				updateTextForm()
+				viewer.drawTree(usrData.formula)
+				return True
+			else:
+				for succ in father.succ:
+					if replacerec(succ,selected,elem):
+						return True
+				return False
+
+		return False
+	def replace(selected,elem):
 	
 
-
-	def replace(selected,elem):
-		""" remplace l'élément sélectonner par un nouvel elelment 
-		dans le tuple des succ de ses pêre en conservant la position
-		renvoi False si selected n'a pas était trouvé"""
-
+		saveFormula()
 		if usrData.formula==selected:
 			usrData.formula=elem
 			usrData.select=elem
+
+			viewer.drawTree(usrData.formula)
+			updateTextForm()
 			return True
 		else:
-			def replacerec(father,selected,elem):
-				"""partie récursive de replace"""
-				
-				if not isinstance(father,(cl.Variable, cl.Top, cl.Bot)) :
-					if selected in father.succ:
-						father.succ=[elem if x==selected else x for x in father.succ]
-						return True
-					else:
-						for succ in father.succ:
-							if replacerec(succ,selected,elem):
-								return True
-						return False
-				return False
-
 			if replacerec(usrData.formula,selected,elem):
 				usrData.select=elem
 				return True
@@ -550,6 +604,96 @@ def createFormulaFrame() :
 			entryTextVar.set(entryText)
 
 
+
+	def succDecide(select,newnode):
+		if not isinstance(select,(cl.Top,cl.Bot,cl.Variable)) or isinstance(newnode,(cl.Top,cl.Bot,cl.Variable)):
+			
+			index=[ x for x in range(len(select.succ)) if select.succ[x].name!= "undefined"]
+                
+			if len(index)!=0:
+				popup=Toplevel()
+				popup.minsize(300,200)
+                # popup.maxsize(300,200)
+				popup.grab_set()
+
+				popupFrame = ttk.Frame(popup, padding = (20, 2, 20, 10))
+				popupFrame.grid(column = 0, row = 0, sticky = (N, S, E, W))
+				def conserver(indexold,indexnew):
+					for x in range(len(indexold)):
+						newnode.succ[indexnew[x]]=select.succ[indexold[x]]
+					viewer.drawTree(usrData.formula)
+					popup.grab_release()
+					popup.destroy()
+					popup.update()
+
+				label = ttk.Label(popupFrame,text = select.name + " a déjà "+ ("un" if len(index)==1 else "deux") +" fils "+ ("assigné" if len(index)==1 else "assignés") +" voulez vous en conserver pour "+ newnode.name +" ?", style = "Keep.TLabel")
+
+				rien = ttk.Button(popupFrame,text="Ne rien conserver",command = lambda : conserver([], []), style = 'Conserver.TButton')
+				if isinstance(newnode,cl.Not):
+					if len(index)==1:
+						cons=ttk.Button(popupFrame,text="Conserver le fils",command = lambda : conserver([index[0]], [0]), style = 'Conserver.TButton')
+
+						cons.grid(row=1,column=0,sticky=(N, S, E, W))
+
+						label.grid(column = 0, row = 0, sticky=(N, E, W))
+						rien.grid(column=0, row=3, sticky=(N, S, E, W))                        
+
+   
+					elif len(index)==2:
+						conserver1=ttk.Button(popupFrame,text="Conserver le fils gauche", command = lambda: conserver([index[0]], [0]), style = 'Conserver.TButton')
+						conserver2=ttk.Button(popupFrame,text="Conserver le fils droit", command = lambda: conserver([index[1]], [0]), style = 'Conserver.TButton')
+
+						conserver1.grid(row=1,column=0, sticky=(N, S, E, W))
+						conserver2.grid(row=1,column=1, sticky=(N, S, E, W))
+
+						label.grid(column = 0, row = 0, columnspan = 2, sticky=(N, E, W))
+						rien.grid(column=0, row=3, columnspan = 2, sticky=(N, S, E, W))
+
+						popupFrame.columnconfigure(1, weight = 1)
+				else:
+					if len(index)==1:
+						conserverL=ttk.Button(popupFrame,text="Conserver le fils et le placer a gauche", command = lambda : conserver([index[0]], [0]), style = 'Conserver.TButton')
+						conserverR=ttk.Button(popupFrame,text="Conserver le fils et le placer a droite", command = lambda : conserver([index[0]], [1]), style = 'Conserver.TButton')
+
+						conserverL.grid(row=1,column=0,sticky=(N, S, E, W))
+						conserverR.grid(row=1,column=1,sticky=(N, S, E, W))
+
+						label.grid(column = 0, row = 0, columnspan = 2, sticky=(N, E, W))
+						rien.grid(column=0, row=3, columnspan = 2, sticky=(N, S, E, W))
+                        
+						popupFrame.columnconfigure(1, weight = 1)
+					elif len(index)==2:
+						conserver1L=ttk.Button(popupFrame,text="Conserver le fils gauche et le placer a gauche", command= lambda : conserver([index[0]], [0]), style = 'Conserver.TButton')
+						conserver1R=ttk.Button(popupFrame,text="Conserver le fils gauche et le placer a droite", command= lambda : conserver([index[0]], [1]), style = 'Conserver.TButton')
+						conserver2L=ttk.Button(popupFrame,text="Conserver le fils droit et le placer a gauche", command= lambda : conserver([index[1]], [0]), style = 'Conserver.TButton')
+						conserver2R=ttk.Button(popupFrame,text="Conserver le fils droit et le placer a droite", command= lambda : conserver([index[1]], [1]), style = 'Conserver.TButton')
+						cons=ttk.Button(popupFrame,text="Conserver les deux", command= lambda : conserver(index, [0,1]), style = 'Conserver.TButton')
+						conserverRev=ttk.Button(popupFrame,text="Conserver les deux mais inverser leurs position", command= lambda : conserver(index, [1,0]), style = 'Conserver.TButton')
+
+						conserver1L.grid(row=1,column=0,sticky=(N, S, E, W))
+						conserver1R.grid(row=1,column=1,sticky=(N, S, E, W))
+						conserver2L.grid(row=1,column=2,sticky=(N, S, E, W))
+						conserver2R.grid(row=2,column=0,sticky=(N, S, E, W))
+						cons.grid(row=2,column=1,sticky=(N, S, E, W))
+						conserverRev.grid(row=2,column=2,sticky=(N, S, E, W))
+
+						label.grid(column = 0, row = 0, columnspan = 3, sticky=(N, E, W))
+						rien.grid(column=0, row=3, columnspan = 3, sticky=(N, S, E, W))
+						popupFrame.columnconfigure(1, weight = 1)
+						popupFrame.columnconfigure(2, weight = 1)
+						
+                        
+                    
+
+				popupFrame.columnconfigure(0, weight = 1)
+				popupFrame.rowconfigure(0, weight = 1)
+
+				popup.columnconfigure(0, weight = 1)
+				popup.rowconfigure(0, weight = 1)
+				popup.title("Que faire des fils présents ?")
+				return True
+			return False
+
 	def createVar(*args):
 		"""Crée une variable a la place de la node sélectionner qui auras pour nom
 		en suivant l'ordre de priorité : ce qu'il y a dans l'entré de texte, le nom selectioné dans la listbox
@@ -561,17 +705,11 @@ def createFormulaFrame() :
 				var = cl.Variable(varnameEntry.get().lower())
 				if replace(usrData.select,var):
 
-					viewer.drawTree(usrData.formula)
-					temp=[]
-					i=0
-					while i  <len(listVar):
-						if listVar[i].name == var.name:
-							listVar.pop(i)
-						else
-							i+=1
-					
-					listVar.insert(0,var)
-					listVarVar.set([var.name for var in listVar])
+
+					if var.name in listVar:
+						listVar.remove(var.name)
+					listVar.insert(0,var.name)
+					listVarVar.set(listVar)
 
 					variableListbox.select_clear(0,"end")
 					variableListbox.select_set(0)
@@ -585,13 +723,12 @@ def createFormulaFrame() :
 				return messagebox.showinfo('message',f"undefined n'est pas un nom de variable valide")
 		elif  len(variableListbox.curselection())==1:
 
-			var=cl.Variable(listVar[variableListbox.curselection()[0].name])
+			var=cl.Variable(listVar[variableListbox.curselection()[0]])
 			if replace(usrData.select,var):
-				viewer.drawTree(usrData.formula)
 
-				listVar.remove(var)
-				listVar.insert(0,var)
-				listVarVar.set([var.name for var in listVar])
+				listVar.remove(var.name)
+				listVar.insert(0,var.name)
+				listVarVar.set(listVar)
 
 				variableListbox.select_clear(0,"end")
 				variableListbox.select_set(0)
@@ -687,18 +824,25 @@ def createFormulaFrame() :
 	entryText = ""
 	entryTextVar = StringVar(value = entryText)
 
+	formText = usrData.formula.__repr__()
+	formTextVar = StringVar(value = formText)
 
+
+	global savedFormula
+	savedFormula = None
 
 	# CREATION DU CADRE DE LA PAGE CREER FORMULE
 
-	formulaMainFrame = ttk.Frame(window, padding = (20, 2, 20, 0))
+	formulaMainFrame = ttk.Frame(window, padding = (20, 2, 20, 5))
 
 
 	# CREATION DES ELEMENTS DU CADRE FORMULE
 
-	formulaTitleFrame = ttk.Label(formulaMainFrame, text='Editeur de formule', style='Titre.TLabel')
+	formulaTitleFrame = ttk.Label(formulaMainFrame, text='Editeur de formule', style='Title.TLabel')
 	graphFrame = ttk.Frame(formulaMainFrame)
 	toolBox = ttk.Notebook(formulaMainFrame)
+	
+	
 	toolsFrame = ttk.Frame(toolBox)
 
 	Bouton_Or = ttk.Button(toolsFrame, text = "Or", command = createOr)
@@ -714,6 +858,13 @@ def createFormulaFrame() :
 	varnameEntry = ttk.Entry(variableFrame, textvariable = entryTextVar)
 	createVarButton = ttk.Button(variableFrame, text='Ajouter', command = createVar)
 	variableListbox = Listbox(variableFrame, selectmode = 'browse', yscrollcommand = True, listvariable = listVarVar)
+	listboxScrollbar = ttk.Scrollbar(variableListbox, orient = VERTICAL, command = variableListbox.yview)
+	formulaLabel = ttk.Label(formulaMainFrame, textvariable = formTextVar, style = 'Formula.TLabel')
+	wellFormedButton = ttk.Button(formulaMainFrame, text = "Valider et passer au modèle", command = wellFormed)
+
+
+	rewindButton = ttk.Button(toolBox, text = 'Annuler le dernier changement', command = rewind)
+
 
 
 	# CREATION DES FRAMES DE REMPLISSAGE DES VIDES (si nécessaire)
@@ -734,8 +885,16 @@ def createFormulaFrame() :
 	toolBox.grid(column = 1, row = 1, sticky = (N, S, E, W), pady = 20, padx = 20)
 	toolsFrame.pack(fill = 'both', expand = True)
 	variableFrame.pack(fill = 'both', expand = True)
-	toolBox.add(toolsFrame, text = 'Outils')
-	toolBox.add(variableFrame, text = 'Variables')
+	rewindButton.pack(side = BOTTOM, fill = X)
+
+
+	Bouton_Not.grid(column = 0, row = 0, sticky = (N, S, E, W))
+	Bouton_Or.grid(column = 0, row = 1, sticky = (N, S, E, W))
+	Bouton_And.grid(column = 0, row = 2, sticky = (N, S, E, W))
+	Bouton_Imp.grid(column = 0, row = 3, sticky = (N, S, E, W))
+	Bouton_Top.grid(column = 0, row = 4, sticky = (N, S, E, W))
+	Bouton_Bot.grid(column = 0, row = 5, sticky = (N, S, E, W))
+
 
 	Bouton_Not.grid(column = 0, row = 0, sticky = (N, S, E, W))
 	Bouton_Or.grid(column = 0, row = 1, sticky = (N, S, E, W))
@@ -748,6 +907,9 @@ def createFormulaFrame() :
 	varnameEntry.grid(column = 0, row = 0, sticky = (N, S, E, W))
 	createVarButton.grid(column = 1, row = 0, sticky = (N, S, E, W))
 	variableListbox.grid(column = 0, row = 1, columnspan = 2, sticky = (N, S, E, W))
+	formulaLabel.grid(column = 0, row = 2, sticky = (N, S, E, W))
+	listboxScrollbar.grid(column = 0, row = 0, sticky = (N, S, E))
+	wellFormedButton.grid(column = 1, row = 2, sticky = (N, S, E, W))
 
 
 	# CONFIGURATION DES ELEMENTS DE LA GRILLE (changement de la taille de la fenêtre)
@@ -758,11 +920,24 @@ def createFormulaFrame() :
 	variableFrame.columnconfigure(0, weight = 1)
 	variableFrame.rowconfigure(1, weight = 1)
 
+	variableListbox.columnconfigure(0, weight = 1)
+	variableListbox.rowconfigure(0, weight = 1)
+
+	toolsFrame.columnconfigure(0, weight = 1)
+	toolsFrame.rowconfigure(0, weight = 1)
+	toolsFrame.rowconfigure(1, weight = 1)
+	toolsFrame.rowconfigure(2, weight = 1)
+	toolsFrame.rowconfigure(3, weight = 1)
+	toolsFrame.rowconfigure(4, weight = 1)
+
 
 	# PARTIE FONCTIONNELLE
 
 
-	
+	toolBox.add(toolsFrame, text = 'Outils')
+	toolBox.add(variableFrame, text = 'Variables')
+
+	variableListbox.configure(yscrollcommand = listboxScrollbar.set)
 
 	variableListbox.bind("<<ListboxSelect>>", changeEntryTextFromListbox)
 	variableListbox.bind("<Double-1>", createVar)
@@ -971,9 +1146,9 @@ style = ttk.Style()
 
 style.theme_use('clam')
 
-style.configure('AfficheModele.TFrame', background='white', borderwidth=15, relief='sunken')
-style.configure('Titre.TLabel', font=('arial 20'), relief='groove', borderwidth=10, anchor='center')
-
-
+style.configure('Title.TLabel', font=('arial 20'), relief='groove', borderwidth=10, anchor='center')
+style.configure('Formula.TLabel', font=('arial 15'), relief='groove', borderwidth=3, anchor='center')
+style.configure('Keep.TLabel', font=('arial 20'), anchor='center')
+style.configure('Conserver.TButton', anchor = 'center')
 
 window.mainloop()
