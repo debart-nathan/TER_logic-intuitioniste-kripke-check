@@ -569,7 +569,8 @@ def createFormulaFrame() :
 					while i  <len(listVar):
 						if listVar[i].name == var.name:
 							listVar.pop(i)
-						i+=1
+						else
+							i+=1
 					
 					listVar.insert(0,var)
 					listVarVar.set([var.name for var in listVar])
