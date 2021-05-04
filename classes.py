@@ -1,5 +1,5 @@
 class Node(object):
-	"""docstring for Node"""
+	"""Base class for every Tree-typed class"""
 	
 
 	def __init__(self, ar, succtup = None):
@@ -12,15 +12,11 @@ class Node(object):
 		self.name = self.__class__.__name__
 
 	def treatment(self):
+		#is to be called for reccursive analysis (see valids() function)
 		pass
 
-	"""
-	def __repr__(self):
-		if self.ar == 1 :
-			return self.succ.__repr__()"""
-
 class Atom(Node):
-	"""docstring for Atom"""
+	"""Derivative subclass for Leaf Nodes (Tree-typed)"""
 	def __init__(self):
 		super(Atom, self).__init__(0)
 
@@ -28,7 +24,7 @@ class Atom(Node):
 		return self.value
 
 
-### représentation des formules
+#Logic ops subclasses (Nodes)
 class And(Node):
 
 	def __init__(self, arg, arg2):
@@ -85,8 +81,9 @@ class Not(Node):
 	def __repr__(self):
 		return '!('+self.succ[0].__repr__()+')'
 
+#Logic ops subclasses (Leafs)
 class Variable(Atom):
-	"""docstring for Variable"""
+	"""Atom subclass for custom Logic variables behaviours"""
 
 	varc_counter=0
 
@@ -97,7 +94,7 @@ class Variable(Atom):
 		Variable.varc_counter+=1
 
 
-	@property
+	@property #Placeholder for custom Logic value (polymorphism)
 	def value(self):
 		return self._value
 
@@ -110,6 +107,7 @@ class Variable(Atom):
 		self._value = False
 
 	def treatment(self, world):
+		#end of reccursive analysis (True if Variable is in World)
 		return self in world.vars or self.name.lower() in [x.name.lower() for x in world.vars]
 
 	def __repr__(self): 
@@ -119,16 +117,20 @@ class Top(Atom):
 	def __init__(self):
 		super(Top, self).__init__()
 		self.value = True
+	def __repr__(self):
+		return "TOP"
 		
 class Bot(Atom):
 	def __init__(self):
 		super(Bot, self).__init__()
 		self.value = False
+	def __repr__(self):
+		return "BOT"
 
-### représentation des mondes	
+### Model
 		
 class World(Node):
-	"""docstring for World"""
+	"""Tree-typed subclass for reccursive model representation"""
 	def __init__(self, name = None, existingVars = []):
 		
 		super(World, self).__init__(0)
@@ -143,7 +145,7 @@ class World(Node):
 		else :
 			self._vars = existingVars
 
-	@property
+	@property #placeholder for reccursive support
 	def sons(self):
 		return self._sons
 
@@ -161,7 +163,7 @@ class World(Node):
 	def sons(self):
 		self._sons = []
 	
-	@property
+	@property #placeholder for logic variables
 	def vars(self):
 		return self._vars
 
@@ -171,7 +173,7 @@ class World(Node):
 			for x in var :
 				if not ((x in self.vars) or (x.name in [n.name for n in self.vars])) :
 					self._vars.append(x)
-		except TypeError:
+		except TypeError: #TypeError triggers if var is not iterable (type(var)!= list/tuple/dict...)
 			if not ((var in self.vars) or (var.name in [n.name for n in self.vars])) :
 				self._vars.append(var)
 		finally :
@@ -188,10 +190,12 @@ class World(Node):
 
 
 def valids(formula, rootWorld):
+	#IN : formula (valid tree-typed Logic compound.s, defined above); rootWorld (first placeholder for reccursive analysis, model)
+	#OUT : Boolean;  True if the given Kripke model validates the formula.
 	for son in rootWorld.sons :
 		if not valids(formula, son):
 			return False
 	return formula.treatment(rootWorld)
 
-Node.classVar = Variable("undefined")
+Node.classVar = Variable("undefined") #Reserved Logic variable for High-end helper 
 
