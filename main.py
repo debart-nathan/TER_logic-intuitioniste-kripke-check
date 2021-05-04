@@ -436,12 +436,12 @@ def createFormulaFrame() :
 
 		if  wellFormedRec(usrData.formula):
 
-			messagebox.showinfo('message',f'BRAVO TU AS REMPLI LES CASES !!!!!')
+			messagebox.showinfo('message',f'La formule n\' est bien formé')
 			usrData.select=usrData.model
 			createModelFrame()
 		
 		else :
-			messagebox.showinfo('message',f"T'ES NUL !!!!!")
+			messagebox.showinfo('message',f'La formule n\' est pas bien formé veuiller remplir toutes les case')
 
 
 	def rewind(*args) :
