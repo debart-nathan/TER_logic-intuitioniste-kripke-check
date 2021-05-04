@@ -436,7 +436,7 @@ def createFormulaFrame() :
 
 		if  wellFormedRec(usrData.formula):
 
-			messagebox.showinfo('message',f'La formule n\' est bien formé')
+			messagebox.showinfo('message',f'La formule est bien formé')
 			usrData.select=usrData.model
 			createModelFrame()
 		
