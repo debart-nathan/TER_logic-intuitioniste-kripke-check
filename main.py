@@ -319,6 +319,7 @@ def getListVarForm():
 	return listvar
 
 
+
 def destroyMainWindowSons() :
 	"""nétoi l'interface de ces éllément"""
 
@@ -429,6 +430,7 @@ def createFormulaFrame() :
 			if node==usrData.select:
 				return 'yellow2'
 			return 'gray77'
+
 
 	def Next(*args) :
 
@@ -964,6 +966,11 @@ def createModelFrame() :
 	destroyMainWindowSons()
 
 
+	# VARIABLES DE CONTROLE
+
+	formText = usrData.formula.__repr__()
+	formTextVar = StringVar(value = formText)
+
 
 	# CREATION DU CADRE DE LA PAGE CREER MODEL
 
@@ -972,8 +979,9 @@ def createModelFrame() :
 
 	# CREATION DES ELEMENTS DU CADRE MODEL
 
-	worldTitleFrame = ttk.Label(worldMainFrame, text='Editeur De Mondes', style='Titre.TLabel')
+	worldTitleFrame = ttk.Label(worldMainFrame, text='Editeur De Mondes', style='Title.TLabel')
 	graphFrame = ttk.Frame(worldMainFrame)
+
 	toolBox = ttk.Notebook(worldMainFrame)
 	toolsFrame = ttk.Frame(toolBox)
 
@@ -985,6 +993,7 @@ def createModelFrame() :
 	
 	variableV=Label(variableFrame, justify=LEFT)
 
+	formulaLabel = ttk.Label(worldMainFrame, textvariable = formTextVar, style = 'Formula.TLabel')
 
 	validatebutton = ttk.Button(worldMainFrame, text='Valider', command = validate)
 	backbutton = ttk.Button(worldMainFrame, text="Revenir à la formule", command = createFormulaFrame)
@@ -1019,6 +1028,8 @@ def createModelFrame() :
 	
 	variableT.grid(column=0,row=0,columnspan=2,sticky=NSEW)
 	variableV.grid(column=0,row=0,columnspan=2,sticky=NSEW)
+
+	formulaLabel.grid(column = 0, row = 2, rowspan=2, sticky = (N, S, E, W))
 
 	validatebutton.grid(column = 1, row = 3, sticky = (N, S, E, W))
 	backbutton.grid(column = 1, row = 2, sticky= (N, S, E, W))
