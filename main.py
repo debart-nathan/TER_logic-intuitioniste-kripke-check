@@ -969,12 +969,12 @@ def createModelFrame() :
 	# VARIABLES DE CONTROLE
 
 	formText = usrData.formula.__repr__()
-	formTextVar = StringVar(value = formText)
+	
 
 
 	# CREATION DU CADRE DE LA PAGE CREER MODEL
 
-	worldMainFrame = ttk.Frame(window, padding = (20, 2, 20, 0))
+	worldMainFrame = ttk.Frame(window, padding = (20, 2, 20, 5))
 
 
 	# CREATION DES ELEMENTS DU CADRE MODEL
@@ -985,15 +985,15 @@ def createModelFrame() :
 	toolBox = ttk.Notebook(worldMainFrame)
 	toolsFrame = ttk.Frame(toolBox)
 
-	variableT=Label(toolsFrame, justify=LEFT)
+	variableT=Label(toolsFrame, justify=LEFT, anchor='w')
 	Bouton_AjoutFils = ttk.Button(toolsFrame, text = "Add son", command = addSon)
 	Bouton_RetraitSelf = ttk.Button(toolsFrame, text = "Remove", command = removeSelf)
 
 	variableFrame = ttk.Frame(toolBox)
 	
-	variableV=Label(variableFrame, justify=LEFT)
+	variableV=Label(variableFrame, justify=LEFT, anchor='w')
 
-	formulaLabel = ttk.Label(worldMainFrame, textvariable = formTextVar, style = 'Formula.TLabel')
+	formulaLabel = ttk.Label(worldMainFrame, text = formText, style = 'Formula.TLabel')
 
 	validatebutton = ttk.Button(worldMainFrame, text='Valider', command = validate)
 	backbutton = ttk.Button(worldMainFrame, text="Revenir à la formule", command = createFormulaFrame)
@@ -1074,7 +1074,7 @@ style = ttk.Style()
 style.theme_use('clam')
 
 style.configure('Title.TLabel', font=('arial 20'), relief='groove', borderwidth=10, anchor='center')
-style.configure('Formula.TLabel', font=('arial 15'), relief='groove', borderwidth=3, anchor='center')
+style.configure('Formula.TLabel', font=('arial 9'), relief='groove', borderwidth=3, anchor='w')
 style.configure('Keep.TLabel', font=('arial 20'), anchor='center')
 style.configure('Conserver.TButton', anchor = 'center')
 
