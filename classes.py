@@ -111,7 +111,7 @@ class Variable(Atom):
 		return self in world.vars or self.name.lower() in [x.name.lower() for x in world.vars]
 
 	def __repr__(self): 
-		return self.name.upper()
+		return self.name.lower()
 
 class Top(Atom):
 	def __init__(self):
