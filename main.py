@@ -451,7 +451,7 @@ def createFormulaFrame() :
 		else :
 			usrData.formula = savedFormula
 			savedFormula = None
-			UsrData.select=usrData.formula
+			usrData.select=usrData.formula
 			updateTextForm()
 			viewer.drawTree(usrData.formula)
 
@@ -926,8 +926,47 @@ def createModelFrame() :
 	def variableWorld():
 
 		def valider ():
+			ancesters=[]
+			listvar2=[listvar[i] for i in frameCheck.curselection()]
+
+			def getAncesters(current):
+				ancesters=[]
+				if usrData.select in current.sons:
+					ancesters.append(current)
+					return ancesters
+				else:
+					for world in current.sons:
+						ancesters=getAncesters(world)
+						if len(ancesters)>0:
+							ancesters.append(current)
+							break
+					
+					return ancesters
+			
+			present=[]
+			if usrData.select != usrData.model:
+				ancesters=getAncesters(usrData.model)
+				for var in usrData.select._vars:
+					if not var in listvar2:
+						for world in ancesters:
+							if var in present:
+								break
+							for var2 in world._vars:
+								if var2.name==var.name:
+									present.append(var)
+									listvar2.append(var)
+									break
+			
+			if len(present)>0:
+				if len(present)==1:
+					message= "La variable "+str(present)+" que vous voulez surpimmer de "+usrData.select.name+" est aussi présente dans au moins un de ses prédésésseurs vous devez d'abbord la supprimer dans ceux-ci avant de pouvoir la supprimer ici"
+				else:
+					message= "Les variables "+str(present)+" que vous voulez surpimmer de "+usrData.select.name+" sont aussi présentent dans au moins un de ses prédésésseurs vous devez d'abbord les supprimer dans ceux-ci avant de pouvoir les supprimer ici"
+				messagebox.showinfo("",f""+message)
+				variableWorld()
+			
 			usrData.select._vars=[]
-			usrData.select.vars = [listvar[i] for i in frameCheck.curselection()]
+			usrData.select.vars = listvar2
 			variableWorld()
 
 		variableT.config(text=usrData.select.name+' : \n'+ str(usrData.select._vars))
