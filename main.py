@@ -763,12 +763,12 @@ def createFormulaFrame() :
 	
 	toolsFrame = ttk.Frame(toolBox)
 
-	Bouton_Or = ttk.Button(toolsFrame, text = "Or", command = createOr)
-	Bouton_And = ttk.Button(toolsFrame, text = "And", command = createAnd)
-	Bouton_Imp = ttk.Button(toolsFrame, text = "Imp", command = createImp)
-	Bouton_Not = ttk.Button(toolsFrame, text = "Not", command = createNot)
-	Bouton_Top = ttk.Button(toolsFrame, text = "Top", command = createTop)
-	Bouton_Bot = ttk.Button(toolsFrame, text = "Bot", command = createBot)
+	bouton_Or = ttk.Button(toolsFrame, text = "Or", command = createOr)
+	bouton_And = ttk.Button(toolsFrame, text = "And", command = createAnd)
+	bouton_Imp = ttk.Button(toolsFrame, text = "Imp", command = createImp)
+	bouton_Not = ttk.Button(toolsFrame, text = "Not", command = createNot)
+	bouton_Top = ttk.Button(toolsFrame, text = "Top", command = createTop)
+	bouton_Bot = ttk.Button(toolsFrame, text = "Bot", command = createBot)
 
 
 
@@ -781,7 +781,7 @@ def createFormulaFrame() :
 	nextButton = ttk.Button(formulaMainFrame, text = "Valider et passer au modèle", command = Next)
 
 
-	rewindButton = ttk.Button(toolBox, text = 'Annuler le dernier changement', command = rewind)
+	rewindButton = ttk.Button(formulaMainFrame, text = 'Annuler le dernier changement', command = rewind)
 
 
 
@@ -803,31 +803,24 @@ def createFormulaFrame() :
 	toolBox.grid(column = 1, row = 1, sticky = (N, S, E, W), pady = 20, padx = 20)
 	toolsFrame.pack(fill = 'both', expand = True)
 	variableFrame.pack(fill = 'both', expand = True)
-	rewindButton.pack(side = BOTTOM, fill = X)
+	
 
 
-	Bouton_Not.grid(column = 0, row = 0, sticky = (N, S, E, W))
-	Bouton_Or.grid(column = 0, row = 1, sticky = (N, S, E, W))
-	Bouton_And.grid(column = 0, row = 2, sticky = (N, S, E, W))
-	Bouton_Imp.grid(column = 0, row = 3, sticky = (N, S, E, W))
-	Bouton_Top.grid(column = 0, row = 4, sticky = (N, S, E, W))
-	Bouton_Bot.grid(column = 0, row = 5, sticky = (N, S, E, W))
-
-
-	Bouton_Not.grid(column = 0, row = 0, sticky = (N, S, E, W))
-	Bouton_Or.grid(column = 0, row = 1, sticky = (N, S, E, W))
-	Bouton_And.grid(column = 0, row = 2, sticky = (N, S, E, W))
-	Bouton_Imp.grid(column = 0, row = 3, sticky = (N, S, E, W))
-	Bouton_Top.grid(column = 0, row = 4, sticky = (N, S, E, W))
-	Bouton_Bot.grid(column = 0, row = 5, sticky = (N, S, E, W))
+	bouton_Not.grid(column = 0, row = 0, sticky = (N, S, E, W))
+	bouton_Or.grid(column = 0, row = 1, sticky = (N, S, E, W))
+	bouton_And.grid(column = 0, row = 2, sticky = (N, S, E, W))
+	bouton_Imp.grid(column = 0, row = 3, sticky = (N, S, E, W))
+	bouton_Top.grid(column = 0, row = 4, sticky = (N, S, E, W))
+	bouton_Bot.grid(column = 0, row = 5, sticky = (N, S, E, W))
 
 
 	varnameEntry.grid(column = 0, row = 0, sticky = (N, S, E, W))
 	createVarButton.grid(column = 1, row = 0, sticky = (N, S, E, W))
 	variableListbox.grid(column = 0, row = 1, columnspan = 2, sticky = (N, S, E, W))
-	formulaLabel.grid(column = 0, row = 2, sticky = (N, S, E, W))
+	formulaLabel.grid(column = 0, row = 2,rowspan=2, sticky = (N, S, E, W))
 	listboxScrollbar.grid(column = 0, row = 0, sticky = (N, S, E))
-	nextButton.grid(column = 1, row = 2, sticky = (N, S, E, W))
+	nextButton.grid(column = 1, row = 3, sticky = (N, S, E, W))
+	rewindButton.grid(column = 1, row = 2, sticky = (N, S, E, W))
 
 
 	# CONFIGURATION DES ELEMENTS DE LA GRILLE (changement de la taille de la fenêtre)
