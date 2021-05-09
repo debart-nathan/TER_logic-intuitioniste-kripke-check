@@ -820,11 +820,8 @@ def createFormulaFrame() :
 	variableListbox.rowconfigure(0, weight = 1)
 
 	toolsFrame.columnconfigure(0, weight = 1)
-	toolsFrame.rowconfigure(0, weight = 1)
-	toolsFrame.rowconfigure(1, weight = 1)
-	toolsFrame.rowconfigure(2, weight = 1)
-	toolsFrame.rowconfigure(3, weight = 1)
-	toolsFrame.rowconfigure(4, weight = 1)
+	[toolsFrame.rowconfigure(i, weight = 1) for i in range(6)]
+
 
 
 	# PARTIE FONCTIONNELLE
