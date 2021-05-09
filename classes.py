@@ -34,7 +34,7 @@ class And(Node):
 		return self.succ[0].treatment(world) and self.succ[1].treatment(world)
 
 	def __repr__(self):
-		return '('+self.succ[0].__repr__()+" ^ "+self.succ[1].__repr__()+')'
+		return '('+self.succ[0].__repr__()+" ∧ "+self.succ[1].__repr__()+')'
 	
 
 class Or(Node):
@@ -47,7 +47,7 @@ class Or(Node):
 
 
 	def __repr__(self):
-		return '('+self.succ[0].__repr__()+" v "+self.succ[1].__repr__()+')'
+		return '('+self.succ[0].__repr__()+" ∨ "+self.succ[1].__repr__()+')'
 		
 
 class Imp(Node):
@@ -63,7 +63,7 @@ class Imp(Node):
 		return True
 
 	def __repr__(self):
-		return '('+self.succ[0].__repr__()+" => "+self.succ[1].__repr__()+')'
+		return '('+self.succ[0].__repr__()+" ⇒ "+self.succ[1].__repr__()+')'
 	
 		
 class Not(Node):
@@ -79,7 +79,7 @@ class Not(Node):
 		return True
 
 	def __repr__(self):
-		return '!('+self.succ[0].__repr__()+')'
+		return '¬('+self.succ[0].__repr__()+')'
 
 #Logic ops subclasses (Leafs)
 class Variable(Atom):
@@ -118,14 +118,14 @@ class Top(Atom):
 		super(Top, self).__init__()
 		self.value = True
 	def __repr__(self):
-		return "TOP"
+		return "⊤"
 		
 class Bot(Atom):
 	def __init__(self):
 		super(Bot, self).__init__()
 		self.value = False
 	def __repr__(self):
-		return "BOT"
+		return "⊥"
 
 ### Model
 		
