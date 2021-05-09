@@ -22,7 +22,7 @@ def defTitle(activeFrame):
 	else:
 		text+=" aucun " 
 
-	text+="| model : "
+	text+="| modèle : "
 	if not (usrData.currentWFile is None):
 		text+=(usrData.currentWFile+".model")
 	else:
@@ -111,7 +111,7 @@ def openInter():
 
 def	saveCInter():
 	if usrData.currentFFile ==None or usrData.currentWFile ==None:
-		messagebox.showinfo('Alert',f'Au moins un des fichers (formule/model) n\'est pas ouvert')
+		messagebox.showinfo('Alert',f'Au moins un des fichers (formule/modèle) n\'est pas ouvert')
 	else:
 		usrData.save(ffileset=usrData.currentFFile,wfilset=usrData.currentWFile)
 
@@ -180,7 +180,7 @@ def saveNFromula():
 
 def	saveCWorld():
 	if  usrData.currentWFile ==None:
-		messagebox.showinfo('Alert',f'Aucun fichier model ouvert')
+		messagebox.showinfo('Alert',f'Aucun fichier modèle ouvert')
 	else:
 		usrData.save(wfilset=usrData.currentWFile)
 
@@ -220,7 +220,7 @@ def	saveCInter():
 	"""sauvegade le dernier fichier de Monde et de Formule ouvert dans l'instance"""
 
 	if usrData.currentFFile ==None or usrData.currentWFile ==None:
-		messagebox.showinfo('Alert',f'Au moins un des fichers (formule/model) n\'est pas ouvert')
+		messagebox.showinfo('Alert',f'Au moins un des fichers (formule/modèle) n\'est pas ouvert')
 	else:
 		usrData.save(ffileset=usrData.currentFFile,wfilset=usrData.currentWFile)
 
@@ -361,7 +361,7 @@ def createToolbar() :
 	fichierMenu.add_command(label = 'Créer une nouvelle interprétation', command = createInter)
 	fichierMenu.add_command(label = 'Ouvrir une interprétation existante', command = openInter)
 	fichierMenu.add_command(label = 'Ouvrir une formule existante', command = openFormula)
-	fichierMenu.add_command(label = 'Ouvrir un modele existant', command = openWorld)
+	fichierMenu.add_command(label = 'Ouvrir un modèle existant', command = openWorld)
 	fichierMenu.add_separator()
 	fichierMenu.add_command(label = "Enregistrer l'interpétation", command = saveCInter) 
 	fichierMenu.add_command(label = "Enregistrer l'interprétation sous...", command = saveNInter)
@@ -369,8 +369,8 @@ def createToolbar() :
 	fichierMenu.add_command(label = "Enregistrer la formule", command = saveCFormula) 
 	fichierMenu.add_command(label = "Enregistrer la formule sous...", command = saveNFromula)
 	fichierMenu.add_separator()
-	fichierMenu.add_command(label = "Enregistrer le model", command = saveCWorld) 
-	fichierMenu.add_command(label = "Enregistrer le model sous...", command = saveNWorld)
+	fichierMenu.add_command(label = "Enregistrer le modèle", command = saveCWorld) 
+	fichierMenu.add_command(label = "Enregistrer le modèle sous...", command = saveNWorld)
 
 	# AJOUT DU MENU FICHIER A LA BARRE DE MENU
 
@@ -934,9 +934,9 @@ def createModelFrame() :
 			
 			if len(present)>0:
 				if len(present)==1:
-					message= "La variable "+str(present)+" que vous voulez surpimmer de "+usrData.select.name+" est aussi présente dans au moins un de ses prédésésseurs vous devez d'abbord la supprimer dans ceux-ci avant de pouvoir la supprimer ici"
+					message= "La variable "+str(present)+" que vous voulez supprimer de "+usrData.select.name+" est aussi présente dans au moins un de ses prédécesseurs vous devez d'abord la supprimer dans ceux-ci avant de pouvoir la supprimer ici"
 				else:
-					message= "Les variables "+str(present)+" que vous voulez surpimmer de "+usrData.select.name+" sont aussi présentent dans au moins un de ses prédésésseurs vous devez d'abbord les supprimer dans ceux-ci avant de pouvoir les supprimer ici"
+					message= "Les variables "+str(present)+" que vous voulez supprimer de "+usrData.select.name+" sont aussi présents dans au moins un de ses prédécesseurs vous devez d'abord les supprimer dans ceux-ci avant de pouvoir les supprimer ici"
 				messagebox.showinfo("",f""+message)
 				variableWorld()
 			
@@ -974,7 +974,7 @@ def createModelFrame() :
 
 
 
-	defTitle("Éditeur de Model")
+	defTitle("Éditeur de modèle")
 	# DESTRUCTION DE l'ANCIENNE FENETRE
 
 	destroyMainWindowSons()
@@ -993,15 +993,15 @@ def createModelFrame() :
 
 	# CREATION DES ELEMENTS DU CADRE MODEL
 
-	worldTitleFrame = ttk.Label(worldMainFrame, text='Editeur De Mondes', style='Title.TLabel')
+	worldTitleFrame = ttk.Label(worldMainFrame, text='Editeur De Modèle', style='Title.TLabel')
 	graphFrame = ttk.Frame(worldMainFrame)
 
 	toolBox = ttk.Notebook(worldMainFrame)
 	toolsFrame = ttk.Frame(toolBox)
 
 	variableT=Label(toolsFrame, justify=LEFT, anchor='w')
-	Bouton_AjoutFils = ttk.Button(toolsFrame, text = "Add son", command = addSon)
-	Bouton_RetraitSelf = ttk.Button(toolsFrame, text = "Remove", command = removeSelf)
+	Bouton_AjoutFils = ttk.Button(toolsFrame, text = "Ajouter fils", command = addSon)
+	Bouton_RetraitSelf = ttk.Button(toolsFrame, text = "Effacer", command = removeSelf)
 
 	variableFrame = ttk.Frame(toolBox)
 	
