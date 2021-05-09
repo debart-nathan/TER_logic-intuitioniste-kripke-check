@@ -232,7 +232,7 @@ def	saveCInter():
 	"""sauvegade le dernier fichier de Monde et de Formule ouvert dans l'instance"""
 
 	if usrData.currentFFile ==None or usrData.currentWFile ==None:
-		messagebox.showinfo('Alert',f'Au moins un des fichers (formule/model) n\'est pas ouvert')
+		messagebox.showinfo('Alert',f'Au moins un des fichers (formule/modèle) n\'est pas ouvert')
 	else:
 		usrData.save(ffileset=usrData.currentFFile,wfilset=usrData.currentWFile)
 
@@ -948,9 +948,9 @@ def createModelFrame() :
 			
 			if len(present)>0:
 				if len(present)==1:
-					message= "La variable "+str(present)+" que vous voulez supprimmer de "+usrData.select.name+" est aussi présente dans au moins un de ses prédécesseurs, vous devez d'abord la supprimer dans ceux-ci avant de pouvoir la supprimer ici"
+					message= "La variable "+str(present)+" que vous voulez supprimer de "+usrData.select.name+" est aussi présente dans au moins un de ses prédécesseurs, vous devez d'abord la supprimer dans ceux-ci avant de pouvoir la supprimer ici"
 				else:
-					message= "Les variables "+str(present)+" que vous voulez surpimmer de "+usrData.select.name+" sont aussi présentes dans au moins un de ses prédécesseurs vous devez d'abord les supprimer dans ceux-ci avant de pouvoir les supprimer ici"
+					message= "Les variables "+str(present)+" que vous voulez supprimer de "+usrData.select.name+" sont aussi présentes dans au moins un de ses prédécesseurs, vous devez d'abord les supprimer dans ceux-ci avant de pouvoir les supprimer ici"
 				messagebox.showinfo("",f""+message)
 				variableWorld()
 			
@@ -1015,7 +1015,7 @@ def createModelFrame() :
 
 	variableT=Label(toolsFrame, justify=LEFT, anchor='w')
 	Bouton_AjoutFils = ttk.Button(toolsFrame, text = "Ajouter fils", command = addSon)
-	Bouton_RetraitSelf = ttk.Button(toolsFrame, text = "Supprimer", command = removeSelf)
+	Bouton_RetraitSelf = ttk.Button(toolsFrame, text = "Effacer", command = removeSelf)
 
 	variableFrame = ttk.Frame(toolBox)
 	
