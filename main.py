@@ -65,64 +65,49 @@ def openFormula():
 
 	currentFile=filedialog.askopenfilename(initialdir="./assets/userdata/" ,filetypes=[("formula file","*.formula")])
 	if currentFile!= ():
-		currentFile=os.path.split(currentFile)
-		if currentFile[0]!=(os.getcwd()+"/assets/userdata"):
-			messagebox.showinfo('Erreur de Dossier',f'prenez un fichier dans ./asset/userdata')
-		else:
-			currentFile=currentFile[1].rsplit( ".", 1 )[ 0 ]
-			usrData.load(ffileset=currentFile)
-			usrData.currentFFile=currentFile	
+		currentFile=os.path.split(currentFile)[1].rsplit( ".", 1 )[ 0 ]
+		usrData.load(ffileset=currentFile)
+		usrData.currentFFile=currentFile	
 	
-			usrData.select=usrData.formula
+		usrData.select=usrData.formula
 
-			if usrData.model==None:
-				usrData.model=cl.World("M:0,0")
-			createFormulaFrame()
+		if usrData.model==None:
+			usrData.model=cl.World("M:0,0")
+		createFormulaFrame()
 
 def openWorld():
 	"""Ouvre un monde près enregistrer a l'aide d'un navigateur de fichier et lance l'éditeur de monde
 	seuls des fichier présent dans 'assets/userdata' peutvent êtres chargé"""
 	currentFile= filedialog.askopenfilename(initialdir="./assets/userdata/" ,filetypes=[("model file","*.model")])
 	if currentFile!= ():
-		currentFile=os.path.split(currentFile)
-		if currentFile[0]!=(os.getcwd()+"/assets/userdata"):
-			messagebox.showinfo('Erreur de Dossier',f'prenez un fichier dans ./asset/userdata')
-		else:
-			currentFile=currentFile[1].rsplit( ".", 1 )[ 0 ]
-			usrData.load(wfileset=currentFile)
+		currentFile=os.path.split(currentFile)[1].rsplit( ".", 1 )[ 0 ]
+		usrData.load(wfileset=currentFile)
 
-			usrData.currentWFile=currentFile
+	if usrData.formula==None:
+		usrData.formula=cl.Variable("undefined")
 
-			if usrData.formula==None:
-				usrData.formula=cl.Variable("undefined")
-
-			if wellFormedRec(usrData.formula) :
-				usrData.select=usrData.model
-				createModelFrame()
-			else:
-				usrData.select=usrData.formula
-				createFormulaFrame()
+	if wellFormedRec(usrData.formula) :
+		usrData.select=usrData.model
+		createModelFrame()
+	else:
+		usrData.select=usrData.formula
+		createFormulaFrame()
 
 def openInter():
 	currentFile= filedialog.askopenfilename(initialdir="./assets/userdata/" ,filetypes=[("formula file","*.formula")])
 	currentFile2= filedialog.askopenfilename(initialdir="./assets/userdata/" ,filetypes=[("model file","*.model")])
 	if currentFile!= () or currentFile2!= ():
-		currentFile=os.path.split(currentFile)
-		currentFile2=os.path.split(currentFile2)
-		if (currentFile[0] or currentFile2[0])!=(os.getcwd()+"/assets/userdata"):
-			messagebox.showinfo('Erreur de Dossier',f'prenez les fichier dans ./asset/userdata')
-		else:
-			currentFile=currentFile[1].rsplit( ".", 1 )[ 0 ]
-			currentFile2=currentFile2[1].rsplit( ".", 1 )[ 0 ]
+		currentFile=os.path.split(currentFile)[1].rsplit( ".", 1 )[ 0 ]
+		currentFile2=os.path.split(currentFile2)[1].rsplit( ".", 1 )[ 0 ]
 
-			usrData.load(ffileset=currentFile)
-			usrData.currentFFile=currentFile
+		usrData.load(ffileset=currentFile)
+		usrData.currentFFile=currentFile
 
-			usrData.load(wfileset=currentFile2)
-			usrData.currentWFile=currentFile2
+		usrData.load(wfileset=currentFile2)
+		usrData.currentWFile=currentFile2
 
-			usrData.select=usrData.formula
-			createFormulaFrame()
+		usrData.select=usrData.formula
+		createFormulaFrame()
 
 def	saveCInter():
 	if usrData.currentFFile ==None or usrData.currentWFile ==None:
