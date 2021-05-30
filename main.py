@@ -801,13 +801,7 @@ def createFormulaFrame() :
 	variableFrame.pack(fill = 'both', expand = True)
 	
 
-
-	bouton_Not.grid(column = 0, row = 0, sticky = (N, S, E, W))
-	bouton_Or.grid(column = 0, row = 1, sticky = (N, S, E, W))
-	bouton_And.grid(column = 0, row = 2, sticky = (N, S, E, W))
-	bouton_Imp.grid(column = 0, row = 3, sticky = (N, S, E, W))
-	bouton_Top.grid(column = 0, row = 4, sticky = (N, S, E, W))
-	bouton_Bot.grid(column = 0, row = 5, sticky = (N, S, E, W))
+	[toolsFrame.rowconfigure(i, weight = 1) for i in range(6)]
 
 
 	varnameEntry.grid(column = 0, row = 0, sticky = (N, S, E, W))
