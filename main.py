@@ -836,6 +836,7 @@ def createFormulaFrame() :
 	toolsFrame.rowconfigure(2, weight = 1)
 	toolsFrame.rowconfigure(3, weight = 1)
 	toolsFrame.rowconfigure(4, weight = 1)
+	toolsFrame.rowconfigure(5, weight = 1)
 
 
 	# PARTIE FONCTIONNELLE
