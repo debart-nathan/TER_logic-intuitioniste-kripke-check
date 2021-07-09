@@ -63,6 +63,22 @@ class Userdata(object):
 		if not (ffileset is None) :
 			with open("./assets/"+("data" if defaultDataFolder else "userdata")+"/"+ffileset+".formula","rb") as file:
 				self.formula = pickle.load(file)
+
+				def getlistvar(current):
+					listvar=[]
+					if isinstance(current,Variable):
+						listvar.append(current)
+					elif not isinstance(current,(Top,Bot)):
+						for succ in current.succ:
+							for var in getlistvar(succ):
+								listvar.append(var)
+					return listvar
+				
+				listvar= getlistvar(self.formula)
+				for i in range(len(listvar)):
+					listvar[i].vari_counter=listvar[i].varc_counter+i
+				listvar[0].varc_counter+=len(listvar)
+
 		if not (wfileset is None) :
 			with open("./assets/"+("data" if defaultDataFolder else "userdata")+"/"+wfileset+".model","rb") as file:
 				self.model = pickle.load(file)
